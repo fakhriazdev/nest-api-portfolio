@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Education {
+  uuid     String @id
+  title    String
+  from     String
+  username String
+  user   User @relation(fields: [username], references: [username])
+  @@map("m_education")
+}
+
+model Profile {
+  uuid          String          @id
+  image         String
+  title         String
+  bio           String
+  username      String          @unique
+  technology  Technology[]
+  testimonial  Testimonial[]
+  user          User[]
+   @@map("m_profile")
+}
+
+model Project {
+  uuid         String         @id
+  title        String
+  stack        Stack          @default(FULLSTACK)
+  AuthorName   String
+  user       User         @relation(fields: [AuthorName], references: [username])
+  technology Technology[]
+  @@map("m_project")
+}
+
+model Technology {
+  uuid      String    @id
+  name      String
+  image     String
+  projectId String
+  ProfileId String
+  profile Profile @relation(fields: [ProfileId], references: [uuid])
+  Project Project @relation(fields: [projectId], references: [uuid])
+  @@map("m_technology")
+}
+
+model Testimonial {
+  uuid        String     @id
+  title       String
+  desc        String
+  by          String
+  status      Status     @default(IDLE)
+  profileUuid String?
+  toUsername  String
+  profile   Profile? @relation(fields: [profileUuid], references: [uuid])
+  user      User     @relation(fields: [toUsername], references: [username])
+
+  @@map("m_testimonial")
+}
+
+model User {
+  username      String          @unique
+  name          String
+  password      String
+  profileUuid   String?
+  education   Education[]
+  project     Project[]
+  testimonial Testimonial[]
+  profile     Profile?      @relation(fields: [profileUuid], references: [uuid])
+  @@map("m_user")
+}
+
+enum Stack {
+  FULLSTACK
+  FRONTEND
+  BACKEND
+}
+
+enum Status {
+  APPROVE
+  IDLE
+}
