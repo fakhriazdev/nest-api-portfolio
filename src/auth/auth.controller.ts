@@ -10,11 +10,11 @@ import { LoginResponse } from 'src/dto/response/LoginResponse';
 @Controller('/api/auth')
 export class AuthController {
 
-    constructor(private readonly _authService:AuthService){}
+    constructor(private readonly authService:AuthService){}
     @Post('/login')
     async login(@Body() request: LoginRequest, @Res() res: Response): Promise<void> {
         try {
-            const loginResponse:LoginResponse = await this._authService.validateUser(request);
+            const loginResponse:LoginResponse = await this.authService.validateUser(request);
             const commonResponse = new CommonResponse('Login Successfully', HttpStatus.ACCEPTED, loginResponse);
             res.status(commonResponse.statusCode).json(commonResponse);
         } catch (error) {
@@ -22,11 +22,11 @@ export class AuthController {
             res.status(commonResponse.statusCode).json(commonResponse);
         }
     }
-
+ 
     @Post('/register')
     async register(@Body() request: RegisterRequest, @Res() res: Response): Promise<void> {
         try {
-            const registerResponse: RegisterResponse = await this._authService.addUser(request);
+            const registerResponse: RegisterResponse = await this.authService.addUser(request);
             const commonResponse = new CommonResponse('Register Successfully', HttpStatus.CREATED, registerResponse);
             res.status(commonResponse.statusCode).json(commonResponse);
         } catch (error) {

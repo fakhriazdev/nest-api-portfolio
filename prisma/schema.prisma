@@ -11,29 +11,28 @@ model Education {
   uuid     String @id
   title    String
   from     String
-  username String
-  user   User @relation(fields: [username], references: [username])
+  profileUuid String
+  profile  Profile @relation(fields: [profileUuid], references: [uuid])
   @@map("m_education")
 }
 
 model Profile {
   uuid          String          @id
-  image         String
-  title         String
-  bio           String
-  username      String          @unique
-  technology  Technology[]
-  testimonial  Testimonial[]
-  user          User[]
-   @@map("m_profile")
+  image         String?
+  title         String?
+  bio           String?
+  education   Education[]
+  user   User @relation(fields: [userId], references: [username])
+  userId String  @unique 
+  @@map("m_profile")
 }
 
 model Project {
   uuid         String         @id
   title        String
   stack        Stack          @default(FULLSTACK)
-  AuthorName   String
-  user       User         @relation(fields: [AuthorName], references: [username])
+  userId   String
+  user       User         @relation(fields: [userId], references: [username])
   technology Technology[]
   @@map("m_project")
 }
@@ -43,8 +42,8 @@ model Technology {
   name      String
   image     String
   projectId String
-  ProfileId String
-  profile Profile @relation(fields: [ProfileId], references: [uuid])
+  userId  String
+  user User? @relation(fields: [userId], references: [username])
   Project Project @relation(fields: [projectId], references: [uuid])
   @@map("m_technology")
 }
@@ -55,10 +54,9 @@ model Testimonial {
   desc        String
   by          String
   status      Status     @default(IDLE)
-  profileUuid String?
-  toUsername  String
-  profile   Profile? @relation(fields: [profileUuid], references: [uuid])
-  user      User     @relation(fields: [toUsername], references: [username])
+  userId String?
+  user   User? @relation(fields: [userId], references: [username])
+
 
   @@map("m_testimonial")
 }
@@ -67,11 +65,10 @@ model User {
   username      String          @unique
   name          String
   password      String
-  profileUuid   String?
-  education   Education[]
+  profile     Profile?
   project     Project[]
-  testimonial Testimonial[]
-  profile     Profile?      @relation(fields: [profileUuid], references: [uuid])
+  technology  Technology[]
+  testimonial  Testimonial[]
   @@map("m_user")
 }
 

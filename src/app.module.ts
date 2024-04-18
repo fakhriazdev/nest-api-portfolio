@@ -7,6 +7,10 @@ import { jwtConstants } from './security/constants';
 import { JwtStrategy } from './security/jwt.strategy';
 import { LocalStrategy } from './security/local.strategy';
 import { PrismaService } from './db/prisma.service';
+import { ProfileController } from './profile/profile.controller';
+import { ProfileService } from './profile/profile.service';
+import { ProfileModule } from './profile/profile.module';
+import { CaslModule } from './casl/casl.module';
 
 @Module({
   
@@ -19,8 +23,10 @@ import { PrismaService } from './db/prisma.service';
           issuer: jwtConstants.issuer
          },
     }),
+    ProfileModule,
+    CaslModule,
 ],
-  controllers: [ AuthController],
-  providers: [ AuthService,PrismaService,LocalStrategy,JwtStrategy],
+  controllers: [ AuthController, ProfileController],
+  providers: [ AuthService,PrismaService,LocalStrategy,JwtStrategy, ProfileService],
 })
 export class AppModule {}

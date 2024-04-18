@@ -1,6 +1,7 @@
 
 
-import { ConflictException, ConsoleLogger, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Prisma, Profile, User } from '.prisma/client';
+import { ConflictException, ConsoleLogger, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/db/prisma.service';
 import { LoginRequest } from 'src/dto/request/loginRequest';
@@ -8,6 +9,7 @@ import { RegisterRequest } from 'src/dto/request/registerRequest';
 import { LoginResponse } from 'src/dto/response/LoginResponse';
 import { RegisterResponse } from 'src/dto/response/RegisterResponse';
 import { encodePassord,comparePassword } from 'src/utils/Bcrypt';
+import { v4 } from 'uuid'
 
 @Injectable()
 export class AuthService {
@@ -37,36 +39,56 @@ export class AuthService {
         
     }
 
-    async addUser(request: RegisterRequest): Promise<RegisterResponse> {
-        const existingUser = await this.prisma.user.findUnique({
-            where: {
-                username: request.username,
-            },
-        });
-        if (existingUser) {
-            throw new ConflictException('Username already exists');
-        }
-        const generatedPw = await encodePassord(request.password);
-        const newUser = await this.prisma.user.create({
-            data: {
-                username: request.username,
-                password: generatedPw,
-                name: request.name,
-                profileUuid : null,
-                
-            },
-        });
+ async addUser(request: RegisterRequest): Promise<RegisterResponse> {
 
-        if (!newUser) {
-            throw new NotFoundException('Failed to create user');
-        }
+    try {
+       const {newUser} = await this.prisma.$transaction(async (prisma) => {
+            const existingUser = await prisma.user.findUnique({
+                where: {
+                    username: request.username,
+                },
+            });
+
+            if (existingUser) {
+                throw new ConflictException('Username already exists');
+            }
+
+            const generatedPw = await encodePassord(request.password);
+            const newUser:User = await prisma.user.create({
+                data: {
+                    username: request.username,
+                    password: generatedPw,
+                    name: request.name,
+                },
+            });
+
+            const newProfile:Profile = await prisma.profile.create({
+                data:{
+                    uuid: v4(),
+                    image: null,
+                    title: null,
+                    bio: null,
+                    userId: newUser.username,
+                },
+            });
+
+            return {
+                newUser,
+                newProfile,
+            };
+        });
 
         const registerResponse: RegisterResponse = {
             username: newUser.username,
             name: newUser.name,
         };
+
         return registerResponse;
+    } catch (error) {
+        throw new ConflictException(error)
     }
+}
+
         
       
 }
