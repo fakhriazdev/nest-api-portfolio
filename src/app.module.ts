@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth/auth.controller';
@@ -10,10 +10,12 @@ import { PrismaService } from './db/prisma.service';
 import { ProfileController } from './profile/profile.controller';
 import { ProfileService } from './profile/profile.service';
 import { ProfileModule } from './profile/profile.module';
-import { CaslModule } from './casl/casl.module';
+import { ProjectController } from './project/project.controller';
+import { ProjectService } from './project/project.service';
+import * as cookieParser from 'cookie-parser';
+
 
 @Module({
-  
   imports: [
     PassportModule,
     JwtModule.register({
@@ -24,9 +26,17 @@ import { CaslModule } from './casl/casl.module';
          },
     }),
     ProfileModule,
-    CaslModule,
+
+
 ],
-  controllers: [ AuthController, ProfileController],
-  providers: [ AuthService,PrismaService,LocalStrategy,JwtStrategy, ProfileService],
+  controllers: [ AuthController, ProfileController, ProjectController],
+  providers: [ AuthService,PrismaService,LocalStrategy,JwtStrategy, ProfileService, ProjectService],
 })
-export class AppModule {}
+export class AppModule {
+ 
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(cookieParser())
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}

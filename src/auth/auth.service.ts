@@ -15,7 +15,6 @@ import { v4 } from 'uuid'
 export class AuthService {
     constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-
     async validateUser(request: LoginRequest):Promise<LoginResponse> {
         const findUser =  await this.prisma.user.findFirst({
             where: { username: request.username },
@@ -29,8 +28,8 @@ export class AuthService {
                 if (!isPasswordValid) {
                     throw new UnauthorizedException('Bad Credential');
                 }
-                const payload = { username: findUser.name, name: findUser.name };
-                const token = this.jwtService.sign(payload);
+                const payload = { username: findUser.username, name: findUser.name };
+                const token = await this.jwtService.signAsync(payload)
                 const loginResponse: LoginResponse = { token };
                 return loginResponse;
             } catch (error) {
@@ -39,7 +38,7 @@ export class AuthService {
         
     }
 
- async addUser(request: RegisterRequest): Promise<RegisterResponse> {
+    async addUser(request: RegisterRequest): Promise<RegisterResponse> {
 
     try {
        const {newUser} = await this.prisma.$transaction(async (prisma) => {
@@ -88,7 +87,6 @@ export class AuthService {
         throw new ConflictException(error)
     }
 }
-
         
       
 }
