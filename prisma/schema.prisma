@@ -23,7 +23,7 @@ model Profile {
   bio           String?
   education   Education[]
   user   User @relation(fields: [userId], references: [username])
-  userId String  @unique 
+  userId String  @unique
   @@map("m_profile")
 }
 

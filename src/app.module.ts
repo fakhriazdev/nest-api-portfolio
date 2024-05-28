@@ -14,6 +14,9 @@ import { ProjectController } from './project/project.controller';
 import { ProjectService } from './project/project.service';
 import * as cookieParser from 'cookie-parser';
 import { ConfigModule } from '@nestjs/config';
+import { EducationService } from './education/education/education.service';
+import { EducationController } from './education/education/education.controller';
+import { EducationModule } from './education/education/education.module';
 @Module({
   imports: [
     PassportModule,
@@ -26,8 +29,14 @@ import { ConfigModule } from '@nestjs/config';
       },
     }),
     ProfileModule,
+    EducationModule,
   ],
-  controllers: [AuthController, ProfileController, ProjectController],
+  controllers: [
+    AuthController,
+    ProfileController,
+    ProjectController,
+    EducationController,
+  ],
   providers: [
     AuthService,
     PrismaService,
@@ -35,6 +44,7 @@ import { ConfigModule } from '@nestjs/config';
     JwtStrategy,
     ProfileService,
     ProjectService,
+    EducationService,
   ],
 })
 export class AppModule {
