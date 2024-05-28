@@ -20,7 +20,10 @@ export class ProjectService {
     });
     return project;
   }
-
+  async getAllProjects(): Promise<Project[]> {
+    const Projects: Project[] = await this.prisma.project.findMany();
+    return Projects;
+  }
   async updateProject(
     uuid: string,
     request: ProjectRequest,

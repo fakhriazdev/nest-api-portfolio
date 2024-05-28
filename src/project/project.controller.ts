@@ -2,15 +2,15 @@ import {
   Body,
   ConflictException,
   Controller,
-  ForbiddenException,
+  ForbiddenException, Get,
   HttpStatus,
   Param,
   Patch,
   Post,
   Request,
   Res,
-  UseGuards,
-} from '@nestjs/common';
+  UseGuards
+} from "@nestjs/common";
 import { ProjectService } from './project.service';
 import { AuthGuard } from '../security/authGuard';
 import { ProjectRequest } from '../dto/request/projectRequest';
@@ -37,6 +37,22 @@ export class ProjectController {
         'Create Project Successfully',
         HttpStatus.CREATED,
         getAddProjectResponse,
+      );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      this.handleException(error, res);
+    }
+  }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  async getProjects(@Res() res: Response) {
+    try {
+      const projectsResponse: any = await this.projectService.getAllProjects();
+      const commonResponse = new CommonResponse(
+        'Get Projects Successfully',
+        HttpStatus.OK,
+        projectsResponse,
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {
