@@ -2,7 +2,10 @@ import {
   Body,
   ConflictException,
   Controller,
+  ForbiddenException,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   Request,
   Res,
@@ -37,21 +40,50 @@ export class ProjectController {
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {
-      if (error instanceof ConflictException) {
-        const commonResponse = new CommonResponse(
-          error.message,
-          HttpStatus.CONFLICT,
-          null,
-        );
-        res.status(commonResponse.statusCode).json(commonResponse);
-      } else {
-        const commonResponse = new CommonResponse(
-          'Internal server error',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-          null,
-        );
-        res.status(commonResponse.statusCode).json(commonResponse);
-      }
+      this.handleException(error, res);
     }
+  }
+
+  @Patch('/:uuid')
+  @UseGuards(AuthGuard)
+  async updateProjectById(
+    @Request() request: any,
+    @Param('uuid') uuid: string,
+    @Body() projectRequest: ProjectRequest,
+    @Res() res: Response,
+  ) {
+    const { username } = request.user;
+
+    try {
+      const responseUpdateProjectById = await this.projectService.updateProject(
+        uuid,
+        projectRequest,
+        username,
+      );
+      const commonResponse = new CommonResponse(
+        'Update Project Successfully',
+        HttpStatus.OK,
+        responseUpdateProjectById,
+      );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      this.handleException(error, res);
+    }
+  }
+
+  private handleException(error: any, res: Response) {
+    let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+    let message = 'Internal server error';
+
+    if (error instanceof ConflictException) {
+      statusCode = HttpStatus.CONFLICT;
+      message = error.message;
+    } else if (error instanceof ForbiddenException) {
+      statusCode = HttpStatus.FORBIDDEN;
+      message = error.message;
+    }
+
+    const commonResponse = new CommonResponse(message, statusCode, null);
+    res.status(commonResponse.statusCode).json(commonResponse);
   }
 }

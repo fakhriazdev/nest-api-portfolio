@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v4 } from 'uuid';
 import { ProjectRequest } from '../dto/request/projectRequest';
@@ -19,6 +19,37 @@ export class ProjectService {
       },
     });
     return project;
+  }
+
+  async updateProject(
+    uuid: string,
+    request: ProjectRequest,
+    username: any,
+  ): Promise<Project> {
+    const { title, stack } = request;
+    const Estack: $Enums.Stack = this.getStackEnumFromString(stack);
+    const data: Project = await this.prisma.project.findUnique({
+      where: {
+        uuid,
+      },
+    });
+    if (!data || data.userId !== username) {
+      throw new UnauthorizedException(
+        'You are not authorized to update this project.',
+      );
+    }
+    const updatedProject: Project = await this.prisma.project.update({
+      where: {
+        uuid,
+      },
+      data: {
+        title,
+        stack: Estack,
+        userId: username,
+      },
+    });
+
+    return updatedProject;
   }
 
   private getStackEnumFromString(stackString: string): Stack {
