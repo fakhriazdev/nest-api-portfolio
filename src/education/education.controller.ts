@@ -21,7 +21,7 @@ import { UpdateEducationRequest } from '../dto/request/UpdateEducationRequest';
 import { DeleteEducationRequest } from '../dto/request/deleteEducationRequest';
 import { AddEducationRequest } from '../dto/request/AddEducationRequest';
 
-@Controller('educations')
+@Controller('/api/educations')
 export class EducationController {
   constructor(private readonly educationService: EducationService) {}
   @UseGuards(AuthGuard)

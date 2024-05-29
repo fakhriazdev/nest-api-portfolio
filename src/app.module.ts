@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth/auth.controller';
@@ -15,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EducationService } from './education/education.service';
 import { EducationController } from './education/education.controller';
 import { EducationModule } from './education/education.module';
+import * as cookieParser from 'cookie-parser';
 @Module({
   imports: [
     PassportModule,
@@ -45,4 +46,10 @@ import { EducationModule } from './education/education.module';
     EducationService,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(cookieParser())
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}
