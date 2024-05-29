@@ -1,16 +1,23 @@
 import { Profile } from '.prisma/client';
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
-import { UpdateUserRequest } from 'src/dto/request/updateUserRequest';
+import { UpdateProfileRequest } from 'src/dto/request/updateProfileRequest';
+import { EducationService } from '../education/education.service';
 
 @Injectable()
 export class ProfileService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly educationService: EducationService,
+  ) {}
 
   async getAll(): Promise<Profile[]> {
     try {
-      const profiles = await this.prisma.profile.findMany();
-      return profiles;
+      return await this.prisma.profile.findMany();
     } catch (err) {
       throw new Error(err);
     }
@@ -35,9 +42,33 @@ export class ProfileService {
 
   async updateProfile(
     id: string,
-    updateData: UpdateUserRequest,
+    updateData: UpdateProfileRequest,
+    username: string,
   ): Promise<Profile> {
-    const { bio, image, title } = updateData;
+    const { bio, image, title, education } = updateData;
+    const { userId } = await this.getOne(id);
+    if (userId !== username) {
+      throw new ForbiddenException();
+    }
+    if (!userId) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    if (education) {
+      await this.educationService.bulkUpdateEducation(education, username);
+      return this.prisma.profile.update({
+        where: {
+          uuid: id,
+        },
+        data: {
+          bio,
+          title,
+          image,
+        },
+        include: {
+          education: true,
+        },
+      });
+    }
     return this.prisma.profile.update({
       where: {
         uuid: id,

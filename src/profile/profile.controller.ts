@@ -18,7 +18,7 @@ import { AuthGuard } from 'src/security/authGuard';
 
 import { CommonResponse } from 'src/dto/response/commonResponse';
 import { Profile } from '.prisma/client';
-import { UpdateUserRequest } from 'src/dto/request/updateUserRequest';
+import { UpdateProfileRequest } from 'src/dto/request/updateProfileRequest';
 
 @Controller('/api/profile')
 export class ProfileController {
@@ -103,7 +103,7 @@ export class ProfileController {
   @Patch('/:id/update')
   async updateProfile(
     @Param('id') id: string,
-    @Body() updateData: UpdateUserRequest,
+    @Body() updateData: UpdateProfileRequest,
     @Request() req: any,
     @Res() res: Response,
   ) {
@@ -118,6 +118,7 @@ export class ProfileController {
     const profileUpdateResponse = await this.profileService.updateProfile(
       id,
       updateData,
+      username,
     );
     const commonResponse = new CommonResponse(
       'Update Profile Successfully',

@@ -1,22 +1,22 @@
 import {
   Body,
-  ConflictException,
   Controller,
-  ForbiddenException, Get,
+  Get,
   HttpStatus,
   Param,
   Patch,
   Post,
   Request,
   Res,
-  UseGuards
-} from "@nestjs/common";
+  UseGuards,
+} from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { AuthGuard } from '../security/authGuard';
 import { ProjectRequest } from '../dto/request/projectRequest';
 import { Response } from 'express';
 import { Project } from '@prisma/client';
 import { CommonResponse } from '../dto/response/commonResponse';
+import { handleException } from '../utils/handleException';
 
 @Controller('/api/project')
 export class ProjectController {
@@ -40,7 +40,7 @@ export class ProjectController {
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {
-      this.handleException(error, res);
+      handleException(error, res);
     }
   }
 
@@ -56,7 +56,7 @@ export class ProjectController {
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {
-      this.handleException(error, res);
+      handleException(error, res);
     }
   }
 
@@ -83,23 +83,7 @@ export class ProjectController {
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {
-      this.handleException(error, res);
+      handleException(error, res);
     }
-  }
-
-  private handleException(error: any, res: Response) {
-    let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
-
-    if (error instanceof ConflictException) {
-      statusCode = HttpStatus.CONFLICT;
-      message = error.message;
-    } else if (error instanceof ForbiddenException) {
-      statusCode = HttpStatus.FORBIDDEN;
-      message = error.message;
-    }
-
-    const commonResponse = new CommonResponse(message, statusCode, null);
-    res.status(commonResponse.statusCode).json(commonResponse);
   }
 }

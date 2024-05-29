@@ -1,9 +1,8 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
-
 import { JwtStrategy } from './security/jwt.strategy';
 import { LocalStrategy } from './security/local.strategy';
 import { PrismaService } from './db/prisma.service';
@@ -12,7 +11,6 @@ import { ProfileService } from './profile/profile.service';
 import { ProfileModule } from './profile/profile.module';
 import { ProjectController } from './project/project.controller';
 import { ProjectService } from './project/project.service';
-import * as cookieParser from 'cookie-parser';
 import { ConfigModule } from '@nestjs/config';
 import { EducationService } from './education/education.service';
 import { EducationController } from './education/education.controller';
@@ -47,10 +45,4 @@ import { EducationModule } from './education/education.module';
     EducationService,
   ],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(cookieParser())
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
-  }
-}
+export class AppModule {}
