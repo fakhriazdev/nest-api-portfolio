@@ -3,8 +3,10 @@ import {
   ConflictException,
   Controller,
   ForbiddenException,
+  forwardRef,
   Get,
   HttpStatus,
+  Inject,
   NotFoundException,
   Param,
   Patch,
@@ -19,10 +21,13 @@ import { AuthGuard } from 'src/security/authGuard';
 import { CommonResponse } from 'src/dto/response/commonResponse';
 import { Profile } from '.prisma/client';
 import { UpdateProfileRequest } from 'src/dto/request/updateProfileRequest';
+import { handleException } from '../utils/handleException';
 
 @Controller('/api/profile')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+  ) {}
 
   @Get('/')
   @UseGuards(AuthGuard)
@@ -74,28 +79,7 @@ export class ProfileController {
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {
-      if (error instanceof ConflictException) {
-        const commonResponse = new CommonResponse(
-          error.message,
-          HttpStatus.CONFLICT,
-          null,
-        );
-        res.status(commonResponse.statusCode).json(commonResponse);
-      } else if (error instanceof NotFoundException) {
-        const commonResponse = new CommonResponse(
-          error.message,
-          HttpStatus.NOT_FOUND,
-          null,
-        );
-        res.status(commonResponse.statusCode).json(commonResponse);
-      } else {
-        const commonResponse = new CommonResponse(
-          'Internal server error',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-          null,
-        );
-        res.status(commonResponse.statusCode).json(commonResponse);
-      }
+      handleException(error, res);
     }
   }
 

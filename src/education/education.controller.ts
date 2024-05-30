@@ -32,10 +32,10 @@ export class EducationController {
     @Request() req: any,
     @Res() res: Response,
   ) {
-    // const { username } = req.user;
+    const { username } = req.user;
     try {
       const response: Education[] =
-        await this.educationService.bulkAddEducation(requests);
+        await this.educationService.bulkAddEducation(requests, username);
       const commonResponse: CommonResponse<Education[]> = new CommonResponse(
         'Create Educations Successfully',
         HttpStatus.OK,
@@ -84,6 +84,7 @@ export class EducationController {
       handleException(error, res);
     }
   }
+  @UseGuards(AuthGuard)
   @Patch('/update')
   async updateEducations(
     @Body(new ValidationPipe({ transform: true }))

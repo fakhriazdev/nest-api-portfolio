@@ -1,4 +1,7 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
+import { EducationModule } from '../education/education.module';
 
-@Module({})
+@Module({
+  imports: [forwardRef(() => EducationModule)],
+})
 export class ProfileModule {}

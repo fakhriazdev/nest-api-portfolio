@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { Education } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -6,11 +6,15 @@ import { UpdateEducationRequest } from '../dto/request/UpdateEducationRequest';
 import { DeleteEducationRequest } from '../dto/request/deleteEducationRequest';
 import { AddEducationRequest } from '../dto/request/AddEducationRequest';
 import { Profile } from '.prisma/client';
-// import { ProfileService } from '../profile/profile.service';
+import { ProfileService } from '../profile/profile.service';
 
 @Injectable()
 export class EducationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(forwardRef(() => ProfileService))
+    private readonly profileService: ProfileService,
+    private readonly prisma: PrismaService,
+  ) {}
   async getEducation(uuid: string): Promise<Education> {
     return this.prisma.education.findFirstOrThrow({
       where: { uuid },
@@ -25,14 +29,22 @@ export class EducationService {
         const educations: Promise<Education>[] = request.map(
           async (item: UpdateEducationRequest) => {
             try {
-              const education: Education = await this.getEducation(item.uuid);
-              if (education.profileUuid !== username) {
+              const profile: Profile = await this.profileService.getOne(
+                item.profileUuid,
+              );
+              if (profile.userId === username && profile) {
+                return await tPrisma.education.update({
+                  where: { uuid: item.uuid },
+                  data: {
+                    uuid: v4(),
+                    title: item.title,
+                    from: item.from,
+                    profileUuid: item.profileUuid,
+                  },
+                });
+              } else {
                 throw new Error('unauthorized');
               }
-              return await tPrisma.education.update({
-                where: { uuid: item.uuid },
-                data: item,
-              });
             } catch (error) {
               throw new Error(error.message);
             }
@@ -41,29 +53,33 @@ export class EducationService {
         return await Promise.all(educations);
       });
     } catch (error) {
-      throw error;
+      throw new Error(`Failed to update Education`);
     }
   }
-  async bulkAddEducation(request: AddEducationRequest[]): Promise<Education[]> {
+  async bulkAddEducation(
+    request: AddEducationRequest[],
+    username: string,
+  ): Promise<Education[]> {
     try {
       return await this.prisma.$transaction(async (tPrisma) => {
         const educations: Promise<Education>[] = request.map(
           async (item: AddEducationRequest) => {
             try {
-              // const profile: Profile = await this.profileService.getOne(
-              //   item.ProfileUuid,
-              // );
-              // if (profile.userId !== username) {
-              //   throw new Error('unauthorized');
-              // }
-              return await tPrisma.education.create({
-                data: {
-                  uuid: v4(),
-                  title: item.title,
-                  from: item.from,
-                  profileUuid: item.ProfileUuid,
-                },
-              });
+              const profile: Profile = await this.profileService.getOne(
+                item.profileUuid,
+              );
+              if (profile.userId === username) {
+                return await tPrisma.education.create({
+                  data: {
+                    uuid: v4(),
+                    title: item.title,
+                    from: item.from,
+                    profileUuid: item.profileUuid,
+                  },
+                });
+              } else {
+                throw new Error('unauthorized');
+              }
             } catch (error) {
               throw new Error(error.message);
             }

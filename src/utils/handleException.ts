@@ -8,7 +8,7 @@ import { CommonResponse } from '../dto/response/commonResponse';
 
 export const handleException = (error: any, res: Response) => {
   let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-  let message = 'Internal server error';
+  let message = error.message;
 
   if (error instanceof ConflictException) {
     statusCode = HttpStatus.CONFLICT;

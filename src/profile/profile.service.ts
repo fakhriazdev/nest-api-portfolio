@@ -1,6 +1,8 @@
 import { Profile } from '.prisma/client';
 import {
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,8 +13,9 @@ import { EducationService } from '../education/education.service';
 @Injectable()
 export class ProfileService {
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => EducationService))
     private readonly educationService: EducationService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async getAll(): Promise<Profile[]> {
