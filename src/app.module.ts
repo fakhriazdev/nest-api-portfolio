@@ -15,6 +15,9 @@ import { ConfigModule } from '@nestjs/config';
 import { EducationService } from './education/education.service';
 import { EducationController } from './education/education.controller';
 import { EducationModule } from './education/education.module';
+import { TechnologyService } from './technology/technology.service';
+import { TechnologyModule } from './technology/technology.module';
+import { TechnologyController } from './technology/technology.controller';
 import * as cookieParser from 'cookie-parser';
 @Module({
   imports: [
@@ -29,12 +32,14 @@ import * as cookieParser from 'cookie-parser';
     }),
     ProfileModule,
     EducationModule,
+    TechnologyModule,
   ],
   controllers: [
     AuthController,
     ProfileController,
     ProjectController,
     EducationController,
+    TechnologyController,
   ],
   providers: [
     AuthService,
@@ -44,6 +49,7 @@ import * as cookieParser from 'cookie-parser';
     ProfileService,
     ProjectService,
     EducationService,
+    TechnologyService,
   ],
 })
 export class AppModule {

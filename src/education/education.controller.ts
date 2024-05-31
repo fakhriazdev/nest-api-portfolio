@@ -17,9 +17,9 @@ import { Education } from '@prisma/client';
 import { Response } from 'express';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
-import { UpdateEducationRequest } from '../dto/request/UpdateEducationRequest';
-import { DeleteEducationRequest } from '../dto/request/deleteEducationRequest';
-import { AddEducationRequest } from '../dto/request/AddEducationRequest';
+import { UpdateEducationRequest } from '../dto/request/education/UpdateEducationRequest';
+import { DeleteEducationRequest } from '../dto/request/education/deleteEducationRequest';
+import { AddEducationRequest } from '../dto/request/education/AddEducationRequest';
 
 @Controller('/api/educations')
 export class EducationController {
@@ -72,12 +72,11 @@ export class EducationController {
   ) {
     const { username } = req.user;
     try {
-      const responseDeleteEducation: string =
-        await this.educationService.bulkRemoveEducation(requests, username);
+      await this.educationService.bulkRemoveEducation(requests, username);
       const commonResponse: CommonResponse<string> = new CommonResponse(
         'Delete Educations Successfully',
         HttpStatus.OK,
-        responseDeleteEducation,
+        null,
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {

@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v4 } from 'uuid';
-import { ProjectRequest } from '../dto/request/projectRequest';
+import { ProjectRequest } from '../dto/request/project/projectRequest';
 import { $Enums, Project, Stack } from '@prisma/client';
 
 @Injectable()
@@ -21,7 +21,11 @@ export class ProjectService {
     return project;
   }
   async getAllProjects(): Promise<Project[]> {
-    const Projects: Project[] = await this.prisma.project.findMany();
+    const Projects: Project[] = await this.prisma.project.findMany({
+      include: {
+        technology: true,
+      },
+    });
     return Projects;
   }
   async updateProject(

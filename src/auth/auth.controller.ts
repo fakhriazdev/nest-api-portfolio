@@ -10,8 +10,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { LoginRequest } from 'src/dto/request/loginRequest';
-import { RegisterRequest } from 'src/dto/request/registerRequest';
+import { LoginRequest } from 'src/dto/request/auth/loginRequest';
+import { RegisterRequest } from 'src/dto/request/auth/registerRequest';
 import { CommonResponse } from 'src/dto/response/commonResponse';
 import { RegisterResponse } from 'src/dto/response/RegisterResponse';
 import { AuthService } from './auth.service';

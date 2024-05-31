@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/db/prisma.service';
-import { LoginRequest } from 'src/dto/request/loginRequest';
-import { RegisterRequest } from 'src/dto/request/registerRequest';
+import { LoginRequest } from 'src/dto/request/auth/loginRequest';
+import { RegisterRequest } from 'src/dto/request/auth/registerRequest';
 import { LoginResponse } from 'src/dto/response/LoginResponse';
 import { RegisterResponse } from 'src/dto/response/RegisterResponse';
 import { encodePassord, comparePassword } from 'src/utils/Bcrypt';

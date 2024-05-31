@@ -1,4 +1,4 @@
-import { UpdateEducationRequest } from './UpdateEducationRequest';
+import { UpdateEducationRequest } from '../education/UpdateEducationRequest';
 import { MaxLength, MinLength } from 'class-validator';
 
 export class UpdateProfileRequest {

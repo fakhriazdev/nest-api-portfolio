@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { AuthGuard } from '../security/authGuard';
-import { ProjectRequest } from '../dto/request/projectRequest';
+import { ProjectRequest } from '../dto/request/project/projectRequest';
 import { Response } from 'express';
 import { Project } from '@prisma/client';
 import { CommonResponse } from '../dto/response/commonResponse';

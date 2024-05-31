@@ -20,7 +20,7 @@ import { AuthGuard } from 'src/security/authGuard';
 
 import { CommonResponse } from 'src/dto/response/commonResponse';
 import { Profile } from '.prisma/client';
-import { UpdateProfileRequest } from 'src/dto/request/updateProfileRequest';
+import { UpdateProfileRequest } from 'src/dto/request/auth/updateProfileRequest';
 import { handleException } from '../utils/handleException';
 
 @Controller('/api/profile')
