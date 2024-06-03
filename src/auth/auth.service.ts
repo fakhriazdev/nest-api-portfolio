@@ -10,7 +10,7 @@ import { LoginRequest } from 'src/dto/request/auth/loginRequest';
 import { RegisterRequest } from 'src/dto/request/auth/registerRequest';
 import { LoginResponse } from 'src/dto/response/LoginResponse';
 import { RegisterResponse } from 'src/dto/response/RegisterResponse';
-import { encodePassord, comparePassword } from 'src/utils/Bcrypt';
+import { comparePassword, encodePassord } from 'src/utils/Bcrypt';
 import { v4 } from 'uuid';
 
 @Injectable()
@@ -38,8 +38,7 @@ export class AuthService {
       }
       const payload = { username: findUser.username, name: findUser.name };
       const token = await this.jwtService.signAsync(payload);
-      const loginResponse: LoginResponse = { token };
-      return loginResponse;
+      return { token };
     } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -83,12 +82,10 @@ export class AuthService {
         };
       });
 
-      const registerResponse: RegisterResponse = {
+      return {
         username: newUser.username,
         name: newUser.name,
       };
-
-      return registerResponse;
     } catch (error) {
       throw new ConflictException(error);
     }
