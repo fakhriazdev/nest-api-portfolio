@@ -86,4 +86,21 @@ export class ProjectController {
       handleException(error, res);
     }
   }
+
+  @Get('/:uuid')
+  @UseGuards(AuthGuard)
+  async getProjectById(@Param('uuid') uuid: string, @Res() res: Response) {
+    try {
+      const responseGetProject: Project =
+        await this.projectService.getProject(uuid);
+      const commonResponse: CommonResponse<Project> = new CommonResponse(
+        'Get Project Successfully',
+        HttpStatus.OK,
+        responseGetProject,
+      );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      handleException(error, res);
+    }
+  }
 }

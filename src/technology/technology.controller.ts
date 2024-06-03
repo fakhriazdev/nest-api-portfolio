@@ -1,10 +1,16 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
+  Patch,
+  Post,
+  Request,
   Res,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { TechnologyService } from './technology.service';
 import { AuthGuard } from '../security/authGuard';
@@ -12,6 +18,9 @@ import { Response } from 'express';
 import { Technology } from '@prisma/client';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
+import { RequestAddTechnology } from '../dto/request/technology/requestAddTechnology';
+import { RequestUpdateTechnology } from '../dto/request/technology/requestUpdateTechnology';
+import { RequestDeleteTechnology } from "../dto/request/technology/requestDeleteTechnology";
 
 @Controller('/api/technology')
 export class TechnologyController {
@@ -44,6 +53,76 @@ export class TechnologyController {
         'Get Projects Successfully',
         HttpStatus.OK,
         responseTechnology,
+      );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      handleException(error, res);
+    }
+  }
+
+  @Post()
+  @UseGuards(AuthGuard)
+  async addTechnology(
+    @Request() req: any,
+    @Body(new ValidationPipe({ transform: true }))
+    request: RequestAddTechnology,
+    @Res() res: Response,
+  ) {
+    const { username } = req.user;
+    try {
+      const responseAddTechnology: Technology =
+        await this.technologyService.addTechnology(request, username);
+      const commonResponse: CommonResponse<Technology> = new CommonResponse(
+        'Add Technology Successfully',
+        HttpStatus.CREATED,
+        responseAddTechnology,
+      );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      handleException(error, res);
+    }
+  }
+
+  @Patch('/update')
+  @UseGuards(AuthGuard)
+  async updateTechnologyById(
+    @Request() req: any,
+    @Body(new ValidationPipe({ transform: true }))
+    request: RequestUpdateTechnology,
+    @Res() res: Response,
+  ) {
+    const { username } = req.user;
+    try {
+      const responseUpdateTechnologyById: Technology =
+        await this.technologyService.updateTechnologyById(request, username);
+      const commonResponse: CommonResponse<Technology> =
+        new CommonResponse<Technology>(
+          'Update Technology Successfully',
+          HttpStatus.OK,
+          responseUpdateTechnologyById,
+        );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      handleException(error, res);
+    }
+  }
+
+  @Delete('/delete')
+  @UseGuards(AuthGuard)
+  async deleteTechnologyById(
+    @Request() req: any,
+    @Body(new ValidationPipe({ transform: true }))
+    request: RequestDeleteTechnology,
+    @Res() res: Response,
+  ) {
+    const { username } = req.user;
+    try {
+      const responseDeleteTechnologyById: void =
+        await this.technologyService.deleteTechnology(request, username);
+      const commonResponse: CommonResponse<void> = new CommonResponse(
+        'deleted Technology Successfully',
+        HttpStatus.OK,
+        responseDeleteTechnologyById,
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {

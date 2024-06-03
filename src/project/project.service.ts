@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v4 } from 'uuid';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
@@ -58,7 +62,13 @@ export class ProjectService {
 
     return updatedProject;
   }
-
+  async getProject(uuid: string): Promise<Project> {
+    try {
+      return this.prisma.project.findUnique({ where: { uuid } });
+    } catch (error) {
+      throw new NotFoundException();
+    }
+  }
   private getStackEnumFromString(stackString: string): Stack {
     switch (stackString.toLowerCase()) {
       case 'fullstack':

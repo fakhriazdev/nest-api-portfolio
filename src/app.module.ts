@@ -18,6 +18,7 @@ import { EducationModule } from './education/education.module';
 import { TechnologyService } from './technology/technology.service';
 import { TechnologyModule } from './technology/technology.module';
 import { TechnologyController } from './technology/technology.controller';
+import { ProjectModule } from './project/project.module';
 import * as cookieParser from 'cookie-parser';
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import * as cookieParser from 'cookie-parser';
     ProfileModule,
     EducationModule,
     TechnologyModule,
+    ProjectModule,
   ],
   controllers: [
     AuthController,
