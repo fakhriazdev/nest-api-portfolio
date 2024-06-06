@@ -10,7 +10,7 @@ import { LoginRequest } from 'src/dto/request/auth/loginRequest';
 import { RegisterRequest } from 'src/dto/request/auth/registerRequest';
 import { LoginResponse } from 'src/dto/response/LoginResponse';
 import { RegisterResponse } from 'src/dto/response/RegisterResponse';
-import { comparePassword, encodePassord } from 'src/utils/Bcrypt';
+import { comparePassword, encodePassord } from 'src/utils/bcrypt';
 import { v4 } from 'uuid';
 
 @Injectable()
