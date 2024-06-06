@@ -7,11 +7,24 @@ import { PrismaService } from '../db/prisma.service';
 import { v4 } from 'uuid';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
 import { $Enums, Project, Stack } from '@prisma/client';
+import { put } from '@vercel/blob';
 
 @Injectable()
 export class ProjectService {
   constructor(private readonly prisma: PrismaService) {}
-
+  async addImage(file) {
+    try {
+      if (!file) {
+        throw new Error('No files uploaded');
+      }
+      return await put(file.filename(), file, {
+        access: 'public',
+        multipart: true,
+      });
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
   async addProject(request: ProjectRequest, username: any): Promise<Project> {
     const stack: $Enums.Stack = this.getStackEnumFromString(request.stack);
     const project: Project = await this.prisma.project.create({

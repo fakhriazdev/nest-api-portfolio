@@ -8,7 +8,9 @@ import {
   Post,
   Request,
   Res,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { AuthGuard } from '../security/authGuard';
@@ -17,6 +19,7 @@ import { Response } from 'express';
 import { Project } from '@prisma/client';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('/api/project')
 export class ProjectController {
@@ -53,6 +56,23 @@ export class ProjectController {
         'Get Projects Successfully',
         HttpStatus.OK,
         projectsResponse,
+      );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      handleException(error, res);
+    }
+  }
+
+  @Post('/upload')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FilesInterceptor('file'))
+  async uploadImage(@UploadedFiles() file, @Res() res: Response) {
+    try {
+      const responseUploadImage = await this.projectService.addImage(file);
+      const commonResponse = new CommonResponse(
+        'Get Projects Successfully',
+        HttpStatus.OK,
+        responseUploadImage,
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {
