@@ -42,7 +42,7 @@ export class AuthController {
       handleException(error, res);
     }
   }
-  @UseGuards(AuthGuard)
+
   @Post('/register')
   async register(
     @Body(new ValidationPipe({ transform: true })) request: RegisterRequest,
