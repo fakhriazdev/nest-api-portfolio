@@ -44,6 +44,7 @@ export class AuthService {
     }
   }
 
+
   async addUser(request: RegisterRequest): Promise<RegisterResponse> {
     try {
       const { newUser } = await this.prisma.$transaction(async (prisma) => {

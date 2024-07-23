@@ -62,7 +62,23 @@ export class AuthController {
     }
   }
 
-  @Get('user-info')
+  @UseGuards(AuthGuard)
+  @Post('/logout')
+  async logout(@Request() req: any, @Res() res: Response): Promise<void> {
+    try {
+      res.clearCookie('jwt');
+      const commonResponse = new CommonResponse(
+        'Logged out successfully',
+        HttpStatus.OK,
+        null,
+      );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      handleException(error, res);
+    }
+  }
+
+  @Get('/user-info')
   @UseGuards(AuthGuard)
   UserInfo(@Request() request: any) {
     const { username, name } = request.user;
