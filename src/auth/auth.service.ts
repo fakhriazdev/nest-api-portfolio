@@ -8,10 +8,10 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/db/prisma.service';
 import { LoginRequest } from 'src/dto/request/auth/loginRequest';
 import { RegisterRequest } from 'src/dto/request/auth/registerRequest';
-import { LoginResponse } from 'src/dto/response/LoginResponse';
 import { RegisterResponse } from 'src/dto/response/RegisterResponse';
 import { comparePassword, encodePassord } from 'src/utils/bcrypt';
 import { v4 } from 'uuid';
+import { LoginResponse } from '../dto/response/LoginResponse';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +38,7 @@ export class AuthService {
       }
       const payload = { username: findUser.username, name: findUser.name };
       const token = await this.jwtService.signAsync(payload);
-      return { token };
+      return { token,payload };
     } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
     }

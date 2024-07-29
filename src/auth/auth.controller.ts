@@ -35,7 +35,7 @@ export class AuthController {
       const commonResponse = new CommonResponse(
         'Login Successfully',
         HttpStatus.ACCEPTED,
-        null,
+        loginResponse.payload,
       );
       res.status(commonResponse.statusCode).json(commonResponse);
     } catch (error) {
