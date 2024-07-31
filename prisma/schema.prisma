@@ -34,6 +34,8 @@ model Project {
   uuid        String       @id
   title       String
   stack       Stack        @default(FULLSTACK)
+  userId      String
+  user        User         @relation(fields: [userId], references: [username])
   profileUuid String
   profile     Profile      @relation(fields: [profileUuid], references: [uuid])
   technology  Technology[]
@@ -70,6 +72,7 @@ model User {
   name        String
   password    String
   profile     Profile?
+  project     Project[]
   technology  Technology[]
   testimonial Testimonial[]
 

@@ -8,10 +8,12 @@ import { v4 } from 'uuid';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
 import { $Enums, Project, Stack } from '@prisma/client';
 import { put } from '@vercel/blob';
+import { ProfileService } from '../profile/profile.service';
+import { Profile } from '.prisma/client';
 
 @Injectable()
 export class ProjectService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly profileService: ProfileService) {}
   async addImage(file) {
     try {
       if (!file) {
@@ -25,14 +27,15 @@ export class ProjectService {
       throw new Error(err.message);
     }
   }
-  async addProject(request: ProjectRequest, username: any): Promise<Project> {
+  async addProject(request: ProjectRequest, profile: string,username:string): Promise<Project> {
     const stack: $Enums.Stack = this.getStackEnumFromString(request.stack);
     const project: Project = await this.prisma.project.create({
       data: {
         uuid: v4(),
         title: request.title,
         stack,
-        userId: username,
+        profileUuid: profile,
+        userId:username
       },
     });
     return project;
@@ -48,16 +51,17 @@ export class ProjectService {
   async updateProject(
     uuid: string,
     request: ProjectRequest,
-    username: any,
+    username: string,
   ): Promise<Project> {
     const { title, stack } = request;
     const Estack: $Enums.Stack = this.getStackEnumFromString(stack);
+    const profileUUID: Profile = await this.profileService.getOneByUserId(username)
     const data: Project = await this.prisma.project.findUnique({
       where: {
         uuid,
       },
     });
-    if (!data || data.userId !== username) {
+    if (!data || data.profileUuid !== profileUUID.uuid) {
       throw new UnauthorizedException(
         'You are not authorized to update this project.',
       );
@@ -69,7 +73,7 @@ export class ProjectService {
       data: {
         title,
         stack: Estack,
-        userId: username,
+        userId: profileUUID.userId,
       },
     });
 
