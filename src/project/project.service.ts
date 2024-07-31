@@ -8,12 +8,10 @@ import { v4 } from 'uuid';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
 import { $Enums, Project, Stack } from '@prisma/client';
 import { put } from '@vercel/blob';
-import { ProfileService } from '../profile/profile.service';
-import { Profile } from '.prisma/client';
 
 @Injectable()
 export class ProjectService {
-  constructor(private readonly prisma: PrismaService, private readonly profileService: ProfileService) {}
+  constructor(private readonly prisma: PrismaService) {}
   async addImage(file) {
     try {
       if (!file) {
@@ -55,13 +53,12 @@ export class ProjectService {
   ): Promise<Project> {
     const { title, stack } = request;
     const Estack: $Enums.Stack = this.getStackEnumFromString(stack);
-    const profileUUID: Profile = await this.profileService.getOneByUserId(username)
     const data: Project = await this.prisma.project.findUnique({
       where: {
         uuid,
       },
     });
-    if (!data || data.profileUuid !== profileUUID.uuid) {
+    if (!data || data.userId !== username) {
       throw new UnauthorizedException(
         'You are not authorized to update this project.',
       );
@@ -73,7 +70,7 @@ export class ProjectService {
       data: {
         title,
         stack: Estack,
-        userId: profileUUID.userId,
+        userId: username,
       },
     });
 

@@ -43,29 +43,6 @@ export class ProfileService {
     });
   }
 
-  async getOneByUserId(userId: string): Promise<Profile> {
-    return this.prisma.profile.findFirstOrThrow({
-      where: {
-        userId,
-      },
-      include: {
-        education: {
-          select: {
-            uuid: true,
-            title: true,
-            from: true,
-          },
-        },
-        user:{
-          select:{
-            username:true,
-            name:true
-          }
-        }
-      },
-    });
-  }
-
   async updateProfile(
     id: string,
     updateData: UpdateProfileRequest,

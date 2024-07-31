@@ -3,8 +3,10 @@ import {
   ConflictException,
   Controller,
   ForbiddenException,
+  forwardRef,
   Get,
   HttpStatus,
+  Inject,
   NotFoundException,
   Param,
   Patch,
@@ -21,7 +23,7 @@ import { Profile } from '.prisma/client';
 import { UpdateProfileRequest } from 'src/dto/request/auth/updateProfileRequest';
 import { handleException } from '../utils/handleException';
 
-@Controller('/api/profiles')
+@Controller('/api/profile')
 export class ProfileController {
   constructor(
     private readonly profileService: ProfileService,
@@ -64,30 +66,12 @@ export class ProfileController {
     }
   }
 
-  @Get('/detail/:id')
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
+  @Get('/:id')
   async getProfile(@Param('id') uuid: string, @Res() res: Response) {
     try {
       const getProfileResponse: Profile =
         await this.profileService.getOne(uuid);
-      const commonResponse = new CommonResponse(
-        'get profile Successfully',
-        HttpStatus.ACCEPTED,
-        getProfileResponse,
-      );
-      res.status(commonResponse.statusCode).json(commonResponse);
-    } catch (error) {
-      handleException(error, res);
-    }
-  }
-
-
-  @Get('/:userId')
-  @UseGuards(AuthGuard)
-  async getProfileByUser(@Param('userId') userId: string, @Res() res: Response) {
-    try {
-      const getProfileResponse: Profile =
-        await this.profileService.getOneByUserId(userId);
       const commonResponse = new CommonResponse(
         'get profile Successfully',
         HttpStatus.ACCEPTED,
