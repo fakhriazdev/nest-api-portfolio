@@ -8,67 +8,71 @@ datasource db {
 }
 
 model Education {
-  uuid     String @id
-  title    String
-  from     String
+  uuid        String  @id
+  title       String
+  from        String
   profileUuid String
-  profile  Profile @relation(fields: [profileUuid], references: [uuid])
+  profile     Profile @relation(fields: [profileUuid], references: [uuid])
+
   @@map("m_education")
 }
 
 model Profile {
-  uuid          String          @id
-  image         String?
-  title         String?
-  bio           String?
-  education   Education[]
-  user   User @relation(fields: [userId], references: [username])
-  userId String  @unique
+  uuid      String      @id
+  image     String?
+  title     String?
+  bio       String?
+  education Education[]
+  projects  Project[]
+  user      User        @relation(fields: [userId], references: [username])
+  userId    String      @unique
+
   @@map("m_profile")
 }
 
 model Project {
-  uuid         String         @id
-  title        String
-  stack        Stack          @default(FULLSTACK)
-  userId   String
-  user       User         @relation(fields: [userId], references: [username])
-  technology Technology[]
+  uuid        String       @id
+  title       String
+  stack       Stack        @default(FULLSTACK)
+  profileUuid String
+  profile     Profile      @relation(fields: [profileUuid], references: [uuid])
+  technology  Technology[]
+
   @@map("m_project")
 }
 
 model Technology {
-  uuid      String    @id
+  uuid      String  @id
   name      String
   image     String
   projectId String
-  userId  String
-  user User? @relation(fields: [userId], references: [username])
-  Project Project @relation(fields: [projectId], references: [uuid])
+  userId    String
+  user      User?   @relation(fields: [userId], references: [username])
+  Project   Project @relation(fields: [projectId], references: [uuid])
+
   @@map("m_technology")
 }
 
 model Testimonial {
-  uuid        String     @id
-  title       String
-  desc        String
-  by          String
-  status      Status     @default(IDLE)
+  uuid   String  @id
+  title  String
+  desc   String
+  by     String
+  status Status  @default(IDLE)
   userId String?
-  user   User? @relation(fields: [userId], references: [username])
-
+  user   User?   @relation(fields: [userId], references: [username])
 
   @@map("m_testimonial")
 }
 
 model User {
-  username      String          @unique
-  name          String
-  password      String
+  username    String        @unique
+  name        String
+  password    String
   profile     Profile?
-  project     Project[]
   technology  Technology[]
-  testimonial  Testimonial[]
+  testimonial Testimonial[]
+
   @@map("m_user")
 }
 
