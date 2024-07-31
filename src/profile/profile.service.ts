@@ -56,6 +56,12 @@ export class ProfileService {
             from: true,
           },
         },
+        user:{
+          select:{
+            username:true,
+            name:true
+          }
+        }
       },
     });
   }
