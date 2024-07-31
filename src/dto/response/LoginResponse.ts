@@ -1,9 +1,3 @@
-type JwtPayload = {
-    username: string;
-    name: string;
-}
-
-export type LoginResponse = {
-    token: string;
-    payload: JwtPayload;
+export class LoginResponse {
+    token:string
 }
