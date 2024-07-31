@@ -23,7 +23,7 @@ import { Profile } from '.prisma/client';
 import { UpdateProfileRequest } from 'src/dto/request/auth/updateProfileRequest';
 import { handleException } from '../utils/handleException';
 
-@Controller('/api/profile')
+@Controller('/api/profiles')
 export class ProfileController {
   constructor(
     private readonly profileService: ProfileService,
@@ -66,12 +66,29 @@ export class ProfileController {
     }
   }
 
-  // @UseGuards(AuthGuard)
   @Get('/:id')
+  @UseGuards(AuthGuard)
   async getProfile(@Param('id') uuid: string, @Res() res: Response) {
     try {
       const getProfileResponse: Profile =
         await this.profileService.getOne(uuid);
+      const commonResponse = new CommonResponse(
+        'get profile Successfully',
+        HttpStatus.ACCEPTED,
+        getProfileResponse,
+      );
+      res.status(commonResponse.statusCode).json(commonResponse);
+    } catch (error) {
+      handleException(error, res);
+    }
+  }
+
+  @Get('/user/:id')
+  @UseGuards(AuthGuard)
+  async getProfileByUser(@Param('id') id: string, @Res() res: Response) {
+    try {
+      const getProfileResponse: Profile =
+        await this.profileService.getOneByUser(id);
       const commonResponse = new CommonResponse(
         'get profile Successfully',
         HttpStatus.ACCEPTED,
