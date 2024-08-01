@@ -61,7 +61,8 @@ export class ProfileService {
             username:true,
             name:true
           }
-        }
+        },
+        projects:{}
       },
     });
   }
