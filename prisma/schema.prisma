@@ -24,10 +24,20 @@ model Profile {
   bio       String?
   education Education[]
   projects  Project[]
+  follower  Follower[]
   user      User        @relation(fields: [userId], references: [username])
   userId    String      @unique
 
   @@map("m_profile")
+}
+
+model Follower {
+  uuid        String  @id
+  profileUUID String
+  userId      String
+  profile     Profile @relation(fields: [profileUUID], references: [uuid])
+
+  @@map("m_follower")
 }
 
 model Project {

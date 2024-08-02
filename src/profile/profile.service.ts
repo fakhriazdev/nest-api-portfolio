@@ -21,7 +21,12 @@ export class ProfileService {
 
   async getAll(): Promise<Profile[]> {
     try {
-      return await this.prisma.profile.findMany();
+      return await this.prisma.profile.findMany({
+        include:{
+          follower:{},
+          projects:{}
+        }
+      });
     } catch (err) {
       throw new Error(err);
     }
@@ -63,7 +68,9 @@ export class ProfileService {
             name:true
           }
         },
-        projects:{}
+        projects:{},
+        follower:{},
+
       },
     });
   }
