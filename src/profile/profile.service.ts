@@ -16,6 +16,7 @@ export class ProfileService {
     @Inject(forwardRef(() => EducationService))
     private readonly educationService: EducationService,
     private readonly prisma: PrismaService,
+
   ) {}
 
   async getAll(): Promise<Profile[]> {

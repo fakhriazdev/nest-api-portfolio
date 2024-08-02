@@ -33,6 +33,7 @@ model Profile {
 model Project {
   uuid        String       @id
   title       String
+  description String
   stack       Stack        @default(FULLSTACK)
   userId      String
   user        User         @relation(fields: [userId], references: [username])

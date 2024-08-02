@@ -32,10 +32,10 @@ export class ProjectController {
     @Body() projectRequest: ProjectRequest,
     @Res() res: Response,
   ) {
-    const { profile,username } = request.user;
+    const { username } = request.user;
     try {
       const getAddProjectResponse: Project =
-        await this.projectService.addProject(projectRequest, profile,username);
+        await this.projectService.addProject(projectRequest,username);
       const commonResponse = new CommonResponse(
         'Create Project Successfully',
         HttpStatus.CREATED,

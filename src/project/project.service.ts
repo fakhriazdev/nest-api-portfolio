@@ -8,10 +8,12 @@ import { v4 } from 'uuid';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
 import { $Enums, Project, Stack } from '@prisma/client';
 import { put } from '@vercel/blob';
+import { Profile } from '.prisma/client';
+import { ProfileService } from '../profile/profile.service';
 
 @Injectable()
 export class ProjectService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly profileService: ProfileService,private readonly prisma: PrismaService) {}
   async addImage(file) {
     try {
       if (!file) {
@@ -25,14 +27,19 @@ export class ProjectService {
       throw new Error(err.message);
     }
   }
-  async addProject(request: ProjectRequest, profile: string,username:string): Promise<Project> {
+  async addProject(request: ProjectRequest, username:string): Promise<Project> {
     const stack: $Enums.Stack = this.getStackEnumFromString(request.stack);
+    const profile: Profile = await this.profileService.getOneByUser(username)
+    if (profile.userId !== username){
+      throw new UnauthorizedException();
+    }
     const project: Project = await this.prisma.project.create({
       data: {
         uuid: v4(),
         title: request.title,
         stack,
-        profileUuid: profile,
+        description: request.description,
+        profileUuid: profile.uuid,
         userId:username
       },
     });

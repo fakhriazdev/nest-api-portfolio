@@ -7,4 +7,6 @@ export class ProjectRequest {
   title: string;
   @IsNotEmpty({ message: 'Stack field is required' })
   stack: string;
+  @IsNotEmpty({ message: 'Description field is required' })
+  description: string;
 }
