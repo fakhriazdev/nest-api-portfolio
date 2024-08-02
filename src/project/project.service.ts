@@ -10,6 +10,7 @@ import { $Enums, Project, Stack } from '@prisma/client';
 import { put } from '@vercel/blob';
 import { Profile } from '.prisma/client';
 import { ProfileService } from '../profile/profile.service';
+import { timestamp } from 'rxjs';
 
 @Injectable()
 export class ProjectService {
@@ -40,7 +41,8 @@ export class ProjectService {
         stack,
         description: request.description,
         profileUuid: profile.uuid,
-        userId:username
+        userId:username,
+        createdAt:new Date()
       },
     });
     return project;

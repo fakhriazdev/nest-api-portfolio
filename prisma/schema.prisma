@@ -50,8 +50,31 @@ model Project {
   profileUuid String
   profile     Profile      @relation(fields: [profileUuid], references: [uuid])
   technology  Technology[]
+  comments    Comment[]
+  likes       Like[]
+  createdAt   DateTime
 
   @@map("m_project")
+}
+
+model Comment {
+  uuid      String   @id
+  projectId String
+  comment   String
+  userId    String
+  project   Project  @relation(fields: [projectId], references: [uuid])
+  createdAt DateTime
+
+  @@map("t_comment")
+}
+
+model Like {
+  uuid      String  @id
+  projectId String
+  userId    String
+  project   Project @relation(fields: [projectId], references: [uuid])
+
+  @@map("t_like")
 }
 
 model Technology {
