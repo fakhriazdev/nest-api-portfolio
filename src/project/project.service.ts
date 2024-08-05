@@ -51,8 +51,6 @@ export class ProjectService {
     const Projects: Project[] = await this.prisma.project.findMany({
       include: {
         technology: true,
-        comments:true,
-        likes:true
       },
     });
     return Projects;
@@ -67,10 +65,6 @@ export class ProjectService {
     const data: Project = await this.prisma.project.findUnique({
       where: {
         uuid,
-      },
-      include: {
-        comments: true,
-        likes:true,
       },
     });
     if (!data || data.userId !== username) {
@@ -95,10 +89,6 @@ export class ProjectService {
     try {
       return this.prisma.project.findUnique({
         where: { uuid },
-        include: {
-          comments: true,
-          likes:true,
-        },
       });
     } catch (error) {
       throw new NotFoundException();

@@ -4,12 +4,14 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
+import { CommentsController } from './comments/comments.controller';
 import { JwtStrategy } from './security/jwt.strategy';
 import { LocalStrategy } from './security/local.strategy';
 import { PrismaService } from './db/prisma.service';
 import { ProfileModule } from './profile/profile.module';
 import { ProjectModule } from './project/project.module';
 import { EducationModule } from './education/education.module';
+import { CommentsModule } from './comments/comments.module';
 import { TechnologyModule } from './technology/technology.module';
 import { ProfileController } from './profile/profile.controller';
 import { ProjectController } from './project/project.controller';
@@ -32,6 +34,7 @@ import * as cookieParser from 'cookie-parser';
     EducationModule,
     TechnologyModule,
     ProjectModule,
+    CommentsModule,
   ],
   controllers: [
     AuthController,
@@ -39,6 +42,7 @@ import * as cookieParser from 'cookie-parser';
     ProjectController,
     EducationController,
     TechnologyController,
+    CommentsController,
   ],
   providers: [
     AuthService,

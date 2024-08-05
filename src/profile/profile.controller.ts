@@ -17,7 +17,6 @@ import {
 import { ProfileService } from './profile.service';
 import { Response } from 'express';
 import { AuthGuard } from 'src/security/authGuard';
-
 import { CommonResponse } from 'src/dto/response/commonResponse';
 import { Profile } from '.prisma/client';
 import { UpdateProfileRequest } from 'src/dto/request/auth/updateProfileRequest';
