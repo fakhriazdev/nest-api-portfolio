@@ -68,7 +68,12 @@ export class ProfileService {
             name:true
           }
         },
-        projects:{},
+        projects:{
+          include:{
+            comments:true,
+            likes:true,
+          }
+        },
         follower:{},
 
       },
