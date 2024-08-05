@@ -10,7 +10,7 @@ import { $Enums, Project, Stack } from '@prisma/client';
 import { put } from '@vercel/blob';
 import { Profile } from '.prisma/client';
 import { ProfileService } from '../profile/profile.service';
-import { timestamp } from 'rxjs';
+
 
 @Injectable()
 export class ProjectService {
@@ -51,6 +51,8 @@ export class ProjectService {
     const Projects: Project[] = await this.prisma.project.findMany({
       include: {
         technology: true,
+        comments:true,
+        likes:true
       },
     });
     return Projects;
@@ -65,6 +67,10 @@ export class ProjectService {
     const data: Project = await this.prisma.project.findUnique({
       where: {
         uuid,
+      },
+      include: {
+        comments: true,
+        likes:true,
       },
     });
     if (!data || data.userId !== username) {
@@ -87,7 +93,13 @@ export class ProjectService {
   }
   async getProject(uuid: string): Promise<Project> {
     try {
-      return this.prisma.project.findUnique({ where: { uuid } });
+      return this.prisma.project.findUnique({
+        where: { uuid },
+        include: {
+          comments: true,
+          likes:true,
+        },
+      });
     } catch (error) {
       throw new NotFoundException();
     }
