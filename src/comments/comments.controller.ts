@@ -15,8 +15,8 @@ export class CommentsController {
   @Get()
     async getComment(request:string,@Res() res: Response){
     try {
-      const comments :Comment = await this.commentService.getComment(request);
-      const commonResponse: CommonResponse<Comment> = new CommonResponse(
+      const comments :Comment[] = await this.commentService.getComment(request);
+      const commonResponse: CommonResponse<Comment[]> = new CommonResponse(
         'get Comment Successfully',
         HttpStatus.OK,
         comments,
