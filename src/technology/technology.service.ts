@@ -31,7 +31,8 @@ export class TechnologyService {
     userId: string,
   ): Promise<Technology> {
     const { name, image, projectId } = request;
-    const project: Project = await this.projectService.getProject(projectId);
+    const project: Project =
+      await this.projectService.getDetailProject(projectId);
     if (userId !== project.userId) {
       throw new UnauthorizedException();
     }
@@ -51,7 +52,8 @@ export class TechnologyService {
     username: string,
   ): Promise<Technology> {
     const { uuid, name, image, projectId } = request;
-    const project: Project = await this.projectService.getProject(projectId);
+    const project: Project =
+      await this.projectService.getDetailProject(projectId);
     if (username !== project.userId) {
       throw new UnauthorizedException();
     }
@@ -72,7 +74,8 @@ export class TechnologyService {
     username: string,
   ): Promise<void> {
     const { uuid, projectId } = request;
-    const project: Project = await this.projectService.getProject(projectId);
+    const project: Project =
+      await this.projectService.getDetailProject(projectId);
     if (username !== project.userId) {
       throw new UnauthorizedException();
     }

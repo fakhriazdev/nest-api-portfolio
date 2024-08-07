@@ -11,10 +11,12 @@ import { put } from '@vercel/blob';
 import { Profile } from '.prisma/client';
 import { ProfileService } from '../profile/profile.service';
 
-
 @Injectable()
 export class ProjectService {
-  constructor(private readonly profileService: ProfileService,private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly prisma: PrismaService,
+  ) {}
   async addImage(file) {
     try {
       if (!file) {
@@ -28,10 +30,13 @@ export class ProjectService {
       throw new Error(err.message);
     }
   }
-  async addProject(request: ProjectRequest, username:string): Promise<Project> {
+  async addProject(
+    request: ProjectRequest,
+    username: string,
+  ): Promise<Project> {
     const stack: $Enums.Stack = this.getStackEnumFromString(request.stack);
-    const profile: Profile = await this.profileService.getOneByUser(username)
-    if (profile.userId !== username){
+    const profile: Profile = await this.profileService.getOneByUser(username);
+    if (profile.userId !== username) {
       throw new UnauthorizedException();
     }
     const project: Project = await this.prisma.project.create({
@@ -41,8 +46,8 @@ export class ProjectService {
         stack,
         description: request.description,
         profileUuid: profile.uuid,
-        userId:username,
-        createdAt:new Date()
+        userId: username,
+        createdAt: new Date(),
       },
     });
     return project;
@@ -85,7 +90,7 @@ export class ProjectService {
 
     return updatedProject;
   }
-  async getProject(uuid: string): Promise<Project> {
+  async getDetailProject(uuid: string): Promise<Project> {
     try {
       return this.prisma.project.findUnique({
         where: { uuid },
@@ -94,6 +99,13 @@ export class ProjectService {
       throw new NotFoundException();
     }
   }
+
+  async getProjectsByUserId(userId: string): Promise<Project[]> {
+    return this.prisma.project.findMany({
+      where: { userId },
+    });
+  }
+
   private getStackEnumFromString(stackString: string): Stack {
     switch (stackString.toLowerCase()) {
       case 'fullstack':
