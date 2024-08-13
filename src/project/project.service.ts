@@ -103,6 +103,13 @@ export class ProjectService {
   async getProjectsByUserId(userId: string): Promise<Project[]> {
     return this.prisma.project.findMany({
       where: { userId },
+      include:{
+        comments: {
+          select: {
+            uuid: true,
+          },
+        },
+      }
     });
   }
 
