@@ -13,7 +13,7 @@ export class CommentsController {
 
   @UseGuards(AuthGuard)
   @Get()
-    async getComments(request:[],@Res() res: Response){
+    async getComments(@Body() request: any[],@Res() res: Response){
     try {
       const comments :Comment[] = await this.commentService.getComments(request);
       const commonResponse: CommonResponse<Comment[]> = new CommonResponse(
