@@ -1,4 +1,15 @@
-import { Body, Controller, Get, HttpStatus, Post, Request, Res, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Request,
+  Res,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { Response } from 'express';
 import { CommonResponse } from '../dto/response/commonResponse';
@@ -12,10 +23,10 @@ export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 
   @UseGuards(AuthGuard)
-  @Get()
-    async getComments(@Body() request: any[],@Res() res: Response){
+  @Get('/:projectId')
+    async getComments(@Param('projectId') projectId: string,@Res() res: Response){
     try {
-      const comments :Comment[] = await this.commentService.getComments(request);
+      const comments :Comment[] = await this.commentService.getComments(projectId);
       const commonResponse: CommonResponse<Comment[]> = new CommonResponse(
         'get Comments Successfully',
         HttpStatus.OK,
