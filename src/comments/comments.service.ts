@@ -10,13 +10,18 @@ export class CommentsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getComments(projectId: []): Promise<Comment[] | []> {
-    return this.prisma.comment.findMany({
+    const datas =  this.prisma.comment.findMany({
       where: {
         projectId: {
           in: projectId
         }
       }
     });
+    
+    if (datas){
+      return datas
+    }
+    return []
   }
 
   async addComment(request: AddCommentRequest,userId:string): Promise<String> {
