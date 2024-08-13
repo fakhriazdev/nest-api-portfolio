@@ -13,11 +13,11 @@ export class CommentsController {
 
   @UseGuards(AuthGuard)
   @Get()
-    async getComment(request:string,@Res() res: Response){
+    async getComments(request:[],@Res() res: Response){
     try {
-      const comments :Comment[] = await this.commentService.getComment(request);
+      const comments :Comment[] = await this.commentService.getComments(request);
       const commonResponse: CommonResponse<Comment[]> = new CommonResponse(
-        'get Comment Successfully',
+        'get Comments Successfully',
         HttpStatus.OK,
         comments,
       );

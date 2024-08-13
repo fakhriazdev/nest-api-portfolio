@@ -9,9 +9,13 @@ import { v4 } from 'uuid';
 export class CommentsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getComment(projectId: any): Promise<Comment[] | []> {
+  async getComments(projectId: []): Promise<Comment[] | []> {
     return this.prisma.comment.findMany({
-      where: { projectId },
+      where: {
+        projectId: {
+          in: projectId
+        }
+      }
     });
   }
 
