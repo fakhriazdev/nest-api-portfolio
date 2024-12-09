@@ -5,6 +5,6 @@ import * as process from 'node:process';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.enableCors();
-  await app.listen(process.env.PORT || 3000, '0.0.0.0');
+  await app.listen(5019);
 }
 bootstrap();
