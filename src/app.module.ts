@@ -26,10 +26,10 @@ import { CookiesModule } from './cookies/cookies.module';
     PassportModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     JwtModule.register({
-      secret: process.env.SECRET_KEY,
+      secret: process.env.SECRET_KEY || 'secret',
       signOptions: {
         expiresIn: '30d',
-        issuer: process.env.ISSUER_STAMP,
+        issuer: process.env.ISSUER_STAMP || 'fakhriganteng',
       },
     }),
     ProfileModule,
