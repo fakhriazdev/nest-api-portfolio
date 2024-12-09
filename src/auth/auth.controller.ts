@@ -10,13 +10,13 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { LoginRequest } from 'src/dto/request/auth/loginRequest';
-import { RegisterRequest } from 'src/dto/request/auth/registerRequest';
-import { CommonResponse } from 'src/dto/response/commonResponse';
-import { RegisterResponse } from 'src/dto/response/RegisterResponse';
+import { LoginRequest } from '../dto/request/auth/loginRequest';
+import { RegisterRequest } from '../dto/request/auth/registerRequest';
+import { CommonResponse } from '../dto/response/commonResponse';
+import { RegisterResponse } from '../dto/response/RegisterResponse';
 import { AuthService } from './auth.service';
-import { LoginResponse } from 'src/dto/response/LoginResponse';
-import { AuthGuard } from 'src/security/authGuard';
+import { LoginResponse } from '../dto/response/LoginResponse';
+import { AuthGuard } from '../security/authGuard';
 import { handleException } from '../utils/handleException';
 
 @Controller('/api/auth')

@@ -6,8 +6,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/db/prisma.service';
-import { UpdateProfileRequest } from 'src/dto/request/auth/updateProfileRequest';
+import { PrismaService } from '../db/prisma.service';
+import { UpdateProfileRequest } from '../dto/request/auth/updateProfileRequest';
 import { EducationService } from '../education/education.service';
 
 @Injectable()
@@ -16,16 +16,15 @@ export class ProfileService {
     @Inject(forwardRef(() => EducationService))
     private readonly educationService: EducationService,
     private readonly prisma: PrismaService,
-
   ) {}
 
   async getAll(): Promise<Profile[]> {
     try {
       return await this.prisma.profile.findMany({
-        include:{
-          follower:{},
-          projects:{}
-        }
+        include: {
+          follower: {},
+          projects: {},
+        },
       });
     } catch (err) {
       throw new Error(err);
@@ -62,15 +61,14 @@ export class ProfileService {
             from: true,
           },
         },
-        user:{
-          select:{
-            username:true,
-            name:true
-          }
+        user: {
+          select: {
+            username: true,
+            name: true,
+          },
         },
-        projects:{},
-        follower:{},
-
+        projects: {},
+        follower: {},
       },
     });
   }

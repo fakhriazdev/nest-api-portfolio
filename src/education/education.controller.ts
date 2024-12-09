@@ -11,7 +11,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/security/authGuard';
+import { AuthGuard } from '../security/authGuard';
 import { EducationService } from './education.service';
 import { Education } from '@prisma/client';
 import { Response } from 'express';

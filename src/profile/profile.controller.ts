@@ -16,17 +16,15 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { Response } from 'express';
-import { AuthGuard } from 'src/security/authGuard';
-import { CommonResponse } from 'src/dto/response/commonResponse';
+import { AuthGuard } from '../security/authGuard';
+import { CommonResponse } from '../dto/response/commonResponse';
 import { Profile } from '.prisma/client';
-import { UpdateProfileRequest } from 'src/dto/request/auth/updateProfileRequest';
+import { UpdateProfileRequest } from '../dto/request/auth/updateProfileRequest';
 import { handleException } from '../utils/handleException';
 
 @Controller('/api/profiles')
 export class ProfileController {
-  constructor(
-    private readonly profileService: ProfileService,
-  ) {}
+  constructor(private readonly profileService: ProfileService) {}
 
   @Get('/')
   @UseGuards(AuthGuard)

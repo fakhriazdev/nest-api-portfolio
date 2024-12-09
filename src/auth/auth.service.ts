@@ -5,12 +5,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/db/prisma.service';
-import { LoginRequest } from 'src/dto/request/auth/loginRequest';
-import { RegisterRequest } from 'src/dto/request/auth/registerRequest';
-import { LoginResponse } from 'src/dto/response/LoginResponse';
-import { RegisterResponse } from 'src/dto/response/RegisterResponse';
-import { comparePassword, encodePassord } from 'src/utils/bcrypt';
+import { PrismaService } from '../db/prisma.service';
+import { LoginRequest } from '../dto/request/auth/loginRequest';
+import { RegisterRequest } from '../dto/request/auth/registerRequest';
+import { LoginResponse } from '../dto/response/LoginResponse';
+import { RegisterResponse } from '../dto/response/RegisterResponse';
+import { comparePassword, encodePassord } from '../utils/bcrypt';
 import { v4 } from 'uuid';
 
 @Injectable()
@@ -43,7 +43,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
   }
-
 
   async addUser(request: RegisterRequest): Promise<RegisterResponse> {
     try {
