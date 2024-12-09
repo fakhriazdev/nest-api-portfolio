@@ -18,6 +18,7 @@ import { ProjectController } from './project/project.controller';
 import { EducationController } from './education/education.controller';
 import { TechnologyController } from './technology/technology.controller';
 import * as cookieParser from 'cookie-parser';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import * as cookieParser from 'cookie-parser';
     PrismaService,
     LocalStrategy,
     JwtStrategy,
+    AppService,
   ],
 })
 export class AppModule {
