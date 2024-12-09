@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 
 import { Request } from 'express';
-import * as process from "node:process";
+import * as process from 'node:process';
 
 const keys = {
   secret: process.env.SECRET_KEY,

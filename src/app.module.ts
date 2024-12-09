@@ -17,11 +17,12 @@ import { ProfileController } from './profile/profile.controller';
 import { ProjectController } from './project/project.controller';
 import { EducationController } from './education/education.controller';
 import { TechnologyController } from './technology/technology.controller';
-import * as cookieParser from 'cookie-parser';
 import { AppService } from './app.service';
+import { CookiesModule } from './cookies/cookies.module';
 
 @Module({
   imports: [
+    CookiesModule,
     PassportModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     JwtModule.register({
@@ -53,10 +54,4 @@ import { AppService } from './app.service';
     AppService,
   ],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(cookieParser())
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
-  }
-}
+export class AppModule {}
