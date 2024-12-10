@@ -15,7 +15,7 @@ import {
 import { ProjectService } from './project.service';
 import { AuthGuard } from '../security/authGuard';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
-import { Response } from 'express';
+import { FastifyReply as Response } from 'fastify';
 import { Project } from '@prisma/client';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
@@ -41,7 +41,7 @@ export class ProjectController {
         HttpStatus.CREATED,
         getAddProjectResponse,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -57,7 +57,7 @@ export class ProjectController {
         HttpStatus.OK,
         projectsResponse,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -74,7 +74,7 @@ export class ProjectController {
         HttpStatus.OK,
         responseUploadImage,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -101,7 +101,7 @@ export class ProjectController {
         HttpStatus.OK,
         responseUpdateProjectById,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -121,7 +121,7 @@ export class ProjectController {
         HttpStatus.OK,
         responseGetProject,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -139,7 +139,7 @@ export class ProjectController {
         HttpStatus.OK,
         responseGetProject,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }

@@ -14,13 +14,13 @@ import {
 } from '@nestjs/common';
 import { TechnologyService } from './technology.service';
 import { AuthGuard } from '../security/authGuard';
-import { Response } from 'express';
+import { FastifyReply as Response } from 'fastify';
 import { Technology } from '@prisma/client';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
 import { RequestAddTechnology } from '../dto/request/technology/requestAddTechnology';
 import { RequestUpdateTechnology } from '../dto/request/technology/requestUpdateTechnology';
-import { RequestDeleteTechnology } from "../dto/request/technology/requestDeleteTechnology";
+import { RequestDeleteTechnology } from '../dto/request/technology/requestDeleteTechnology';
 
 @Controller('/api/technology')
 export class TechnologyController {
@@ -37,7 +37,7 @@ export class TechnologyController {
         HttpStatus.OK,
         responseTechnologies,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -54,7 +54,7 @@ export class TechnologyController {
         HttpStatus.OK,
         responseTechnology,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -77,7 +77,7 @@ export class TechnologyController {
         HttpStatus.CREATED,
         responseAddTechnology,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -101,7 +101,7 @@ export class TechnologyController {
           HttpStatus.OK,
           responseUpdateTechnologyById,
         );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -124,7 +124,7 @@ export class TechnologyController {
         HttpStatus.OK,
         responseDeleteTechnologyById,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }

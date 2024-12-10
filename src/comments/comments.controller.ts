@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { Response } from 'express';
+import { FastifyReply as Response } from 'fastify';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
 import { AddCommentRequest } from '../dto/request/comment/addCommentRequest';
@@ -36,7 +36,7 @@ export class CommentsController {
         HttpStatus.OK,
         comments,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -60,7 +60,7 @@ export class CommentsController {
         HttpStatus.OK,
         comments,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }

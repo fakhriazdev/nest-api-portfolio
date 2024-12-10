@@ -14,7 +14,7 @@ import {
 import { AuthGuard } from '../security/authGuard';
 import { EducationService } from './education.service';
 import { Education } from '@prisma/client';
-import { Response } from 'express';
+import { FastifyReply as Response } from 'fastify';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
 import { UpdateEducationRequest } from '../dto/request/education/UpdateEducationRequest';
@@ -41,7 +41,7 @@ export class EducationController {
         HttpStatus.OK,
         response,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -57,7 +57,7 @@ export class EducationController {
         HttpStatus.OK,
         educationsResponse,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -78,7 +78,7 @@ export class EducationController {
         HttpStatus.OK,
         null,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -100,7 +100,7 @@ export class EducationController {
         HttpStatus.OK,
         responseBulkUpdateEducation,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }

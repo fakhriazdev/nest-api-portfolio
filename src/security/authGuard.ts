@@ -5,43 +5,48 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-import { Request } from 'express';
+import { FastifyRequest } from 'fastify'; // Import FastifyRequest
 import * as process from 'node:process';
 
 const keys = {
   secret: process.env.SECRET_KEY,
   issuer: process.env.ISSUER_STAMP,
 };
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<FastifyRequest>(); // Use FastifyRequest here
     const { secret, issuer } = keys;
+
     const token = this.extractTokenFromCookie(request);
-    const isValidSignature = await this.verifySignature(token, secret);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('No token found');
     }
+
+    const isValidSignature = await this.verifySignature(token, secret);
     if (!isValidSignature) {
       throw new UnauthorizedException('Invalid token signature');
     }
+
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret,
         issuer,
       });
-      request['user'] = payload;
-    } catch {
-      throw new UnauthorizedException();
+      request['user'] = payload; // Attach the user to the request object
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
     }
+
     return true;
   }
 
-  private extractTokenFromCookie(request: Request): string | undefined {
-    return request.cookies['jwt'];
+  private extractTokenFromCookie(request: FastifyRequest): string | undefined {
+    console.log(request); // This will show all cookies in the request
+    return request.cookies['jwt']; // Extract the token from the cookies
   }
 
   private async verifySignature(
@@ -51,7 +56,7 @@ export class AuthGuard implements CanActivate {
     try {
       await this.jwtService.verifyAsync(token, { secret });
       return true;
-    } catch {
+    } catch (error) {
       return false;
     }
   }

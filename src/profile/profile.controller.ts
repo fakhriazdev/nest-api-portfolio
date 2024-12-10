@@ -15,7 +15,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { Response } from 'express';
+import { FastifyReply as Response } from 'fastify';
 import { AuthGuard } from '../security/authGuard';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { Profile } from '.prisma/client';
@@ -36,7 +36,7 @@ export class ProfileController {
         HttpStatus.ACCEPTED,
         getProfilesResponse,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       if (error instanceof ConflictException) {
         const commonResponse = new CommonResponse(
@@ -44,21 +44,21 @@ export class ProfileController {
           HttpStatus.CONFLICT,
           null,
         );
-        res.status(commonResponse.statusCode).json(commonResponse);
+        res.code(commonResponse.statusCode).send(commonResponse);
       } else if (error instanceof NotFoundException) {
         const commonResponse = new CommonResponse(
           error.message,
           HttpStatus.NOT_FOUND,
           null,
         );
-        res.status(commonResponse.statusCode).json(commonResponse);
+        res.code(commonResponse.statusCode).send(commonResponse);
       } else {
         const commonResponse = new CommonResponse(
           'Internal server error',
           HttpStatus.INTERNAL_SERVER_ERROR,
           null,
         );
-        res.status(commonResponse.statusCode).json(commonResponse);
+        res.code(commonResponse.statusCode).send(commonResponse);
       }
     }
   }
@@ -74,7 +74,7 @@ export class ProfileController {
         HttpStatus.ACCEPTED,
         getProfileResponse,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -91,7 +91,7 @@ export class ProfileController {
         HttpStatus.ACCEPTED,
         getProfileResponse,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -123,6 +123,6 @@ export class ProfileController {
       HttpStatus.ACCEPTED,
       profileUpdateResponse,
     );
-    res.status(commonResponse.statusCode).json(commonResponse);
+    res.code(commonResponse.statusCode).send(commonResponse);
   }
 }

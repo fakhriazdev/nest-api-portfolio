@@ -1,12 +1,6 @@
-import {
-  Inject,
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
-import * as cookieParser from 'cookie-parser';
+import * as fastifyCookie from '@fastify/cookie';
 import cookiesConfig from './cookies.config';
 
 @Module({ imports: [ConfigModule.forFeature(cookiesConfig)] })
@@ -15,9 +9,9 @@ export class CookiesModule implements NestModule {
     @Inject(cookiesConfig.KEY)
     private readonly config: ConfigType<typeof cookiesConfig>,
   ) {}
+
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(cookieParser(this.config.secret))
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
+    // Di sini tidak perlu ada kode untuk NestFactory atau AppModule
+    // Cukup pastikan fastify-cookie sudah didaftarkan di main.ts
   }
 }

@@ -9,7 +9,7 @@ import {
   Get,
   ValidationPipe,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { FastifyReply as Response } from 'fastify';
 import { LoginRequest } from '../dto/request/auth/loginRequest';
 import { RegisterRequest } from '../dto/request/auth/registerRequest';
 import { CommonResponse } from '../dto/response/commonResponse';
@@ -31,13 +31,17 @@ export class AuthController {
     try {
       const loginResponse: LoginResponse =
         await this.authService.validateUser(request);
-      res.cookie('jwt', loginResponse.token, { httpOnly: true });
+      res.setCookie('jwt', loginResponse.token, {
+        httpOnly: true, // Make cookie accessible only by HTTP requests
+        path: '/', // Path where cookie is accessible (default to root '/')
+        maxAge: 1000 * 60 * 60 * 24, // Cookie expiration time (e.g., 1 day)
+      });
       const commonResponse = new CommonResponse(
         'Login Successfully',
         HttpStatus.ACCEPTED,
         null,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -56,7 +60,7 @@ export class AuthController {
         HttpStatus.CREATED,
         registerResponse,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
@@ -72,7 +76,7 @@ export class AuthController {
         HttpStatus.OK,
         null,
       );
-      res.status(commonResponse.statusCode).json(commonResponse);
+      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
       handleException(error, res);
     }
