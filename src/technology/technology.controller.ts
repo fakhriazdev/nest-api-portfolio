@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { TechnologyService } from './technology.service';
 import { AuthGuard } from '../security/authGuard';
-import { FastifyReply as Response } from 'fastify';
+import { Response } from 'express';
 import { Technology } from '@prisma/client';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
@@ -32,14 +32,13 @@ export class TechnologyController {
     try {
       const responseTechnologies: Technology[] =
         await this.technologyService.getAllTechnologies();
-      const commonResponse: CommonResponse<Technology[]> = new CommonResponse(
+      return  new CommonResponse(
         'Get Projects Successfully',
         HttpStatus.OK,
         responseTechnologies,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
@@ -49,14 +48,13 @@ export class TechnologyController {
     try {
       const responseTechnology: Technology =
         await this.technologyService.getTechnology(uuid);
-      const commonResponse: CommonResponse<Technology> = new CommonResponse(
+return new CommonResponse(
         'Get Projects Successfully',
         HttpStatus.OK,
         responseTechnology,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
@@ -72,14 +70,13 @@ export class TechnologyController {
     try {
       const responseAddTechnology: Technology =
         await this.technologyService.addTechnology(request, username);
-      const commonResponse: CommonResponse<Technology> = new CommonResponse(
+      return new CommonResponse(
         'Add Technology Successfully',
         HttpStatus.CREATED,
         responseAddTechnology,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
@@ -95,15 +92,13 @@ export class TechnologyController {
     try {
       const responseUpdateTechnologyById: Technology =
         await this.technologyService.updateTechnologyById(request, username);
-      const commonResponse: CommonResponse<Technology> =
-        new CommonResponse<Technology>(
+    return new CommonResponse<Technology>(
           'Update Technology Successfully',
           HttpStatus.OK,
           responseUpdateTechnologyById,
         );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
@@ -119,14 +114,13 @@ export class TechnologyController {
     try {
       const responseDeleteTechnologyById: void =
         await this.technologyService.deleteTechnology(request, username);
-      const commonResponse: CommonResponse<void> = new CommonResponse(
+     return new CommonResponse(
         'deleted Technology Successfully',
         HttpStatus.OK,
         responseDeleteTechnologyById,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 }

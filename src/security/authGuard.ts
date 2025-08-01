@@ -1,63 +1,56 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { FastifyRequest } from 'fastify'; // Import FastifyRequest
-import * as process from 'node:process';
+import { Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 
-const keys = {
-  secret: process.env.SECRET_KEY,
-  issuer: process.env.ISSUER_STAMP,
-};
+interface JwtPayload {
+  name: string;
+  username: string;
+
+}
+
+interface AuthenticatedRequest extends Request {
+  user?: JwtPayload;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private config: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<FastifyRequest>(); // Use FastifyRequest here
-    const { secret, issuer } = keys;
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
-    const token = this.extractTokenFromCookie(request);
-    if (!token) {
-      throw new UnauthorizedException('No token found');
+    if (request.method === 'OPTIONS') {
+      return true;
     }
+    const token = this.extractToken(request);
 
-    const isValidSignature = await this.verifySignature(token, secret);
-    if (!isValidSignature) {
-      throw new UnauthorizedException('Invalid token signature');
+    if (!token) {
+      throw new UnauthorizedException('Access token not found');
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret,
-        issuer,
+      request.user = await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: this.mustGetEnv('SECRET_KEY'),
+        issuer: this.mustGetEnv('ISSUER_STAMP'),
       });
-      request['user'] = payload; // Attach the user to the request object
     } catch (error) {
+      console.error('JWT verification error:', error);
       throw new UnauthorizedException('Invalid or expired token');
     }
-
     return true;
   }
-
-  private extractTokenFromCookie(request: FastifyRequest): string | undefined {
-    console.log(request); // This will show all cookies in the request
-    return request.cookies['jwt']; // Extract the token from the cookies
+  private extractToken(request: Request): string | undefined {
+    const cookies = request.cookies as Record<string, string>;
+    return cookies?.['access_token'];
   }
 
-  private async verifySignature(
-    token: string,
-    secret: string,
-  ): Promise<boolean> {
-    try {
-      await this.jwtService.verifyAsync(token, { secret });
-      return true;
-    } catch (error) {
-      return false;
-    }
+  private mustGetEnv(key: string): string {
+    const value = this.config.get<string>(key);
+    if (!value) throw new Error(`Missing ENV variable: ${key}`);
+    return value;
   }
 }

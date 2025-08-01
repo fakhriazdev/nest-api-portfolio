@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Patch,
   Post,
-  Request,
+  Req,
   Res,
   UseGuards,
   ValidationPipe,
@@ -14,7 +14,7 @@ import {
 import { AuthGuard } from '../security/authGuard';
 import { EducationService } from './education.service';
 import { Education } from '@prisma/client';
-import { FastifyReply as Response } from 'fastify';
+import { Response, Request } from 'express';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
 import { UpdateEducationRequest } from '../dto/request/education/UpdateEducationRequest';
@@ -29,21 +29,18 @@ export class EducationController {
   async createEducation(
     @Body(new ValidationPipe({ transform: true }))
     requests: AddEducationRequest[],
-    @Request() req: any,
+    @Req() req: any,
     @Res() res: Response,
   ) {
     const { username } = req.user;
     try {
       const response: Education[] =
         await this.educationService.bulkAddEducation(requests, username);
-      const commonResponse: CommonResponse<Education[]> = new CommonResponse(
-        'Create Educations Successfully',
+      return new CommonResponse('Create Educations Successfully',
         HttpStatus.OK,
-        response,
-      );
-      res.code(commonResponse.statusCode).send(commonResponse);
+        response,)
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
   @UseGuards(AuthGuard)
@@ -52,14 +49,11 @@ export class EducationController {
     try {
       const educationsResponse: Education[] =
         await this.educationService.getEducations();
-      const commonResponse = new CommonResponse(
-        'Get Education Successfully',
+      return new CommonResponse('Get Education Successfully',
         HttpStatus.OK,
-        educationsResponse,
-      );
-      res.code(commonResponse.statusCode).send(commonResponse);
+        educationsResponse)
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
   @Delete('/delete')
@@ -67,20 +61,18 @@ export class EducationController {
   async deleteEducations(
     @Body(new ValidationPipe({ transform: true }))
     requests: DeleteEducationRequest[],
-    @Request() req: any,
+    @Req() req: any,
     @Res() res: Response,
   ) {
     const { username } = req.user;
     try {
       await this.educationService.bulkRemoveEducation(requests, username);
-      const commonResponse: CommonResponse<string> = new CommonResponse(
+      return new CommonResponse(
         'Delete Educations Successfully',
         HttpStatus.OK,
-        null,
-      );
-      res.code(commonResponse.statusCode).send(commonResponse);
+        null,)
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
   @UseGuards(AuthGuard)
@@ -88,21 +80,19 @@ export class EducationController {
   async updateEducations(
     @Body(new ValidationPipe({ transform: true }))
     requests: UpdateEducationRequest[],
-    @Request() req: any,
+    @Req() req: any,
     @Res() res: Response,
   ) {
     const { username } = req.user;
     try {
       const responseBulkUpdateEducation: Education[] =
         await this.educationService.bulkUpdateEducation(requests, username);
-      const commonResponse: CommonResponse<Education[]> = new CommonResponse(
+      return new CommonResponse(
         'Update Educations Successfully',
         HttpStatus.OK,
-        responseBulkUpdateEducation,
-      );
-      res.code(commonResponse.statusCode).send(commonResponse);
+        responseBulkUpdateEducation)
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 }

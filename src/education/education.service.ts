@@ -1,11 +1,10 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
-import { Education } from '@prisma/client';
+import { Education,Profile } from '@prisma/client';
 import { v4 } from 'uuid';
 import { UpdateEducationRequest } from '../dto/request/education/UpdateEducationRequest';
 import { DeleteEducationRequest } from '../dto/request/education/deleteEducationRequest';
 import { AddEducationRequest } from '../dto/request/education/AddEducationRequest';
-import { Profile } from '.prisma/client';
 import { ProfileService } from '../profile/profile.service';
 
 @Injectable()

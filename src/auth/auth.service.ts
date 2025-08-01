@@ -1,4 +1,4 @@
-import { Profile, User } from '.prisma/client';
+import { Profile, User } from '@prisma/client';
 import {
   ConflictException,
   Injectable,

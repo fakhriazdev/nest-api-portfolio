@@ -10,15 +10,15 @@ import {
   NotFoundException,
   Param,
   Patch,
-  Request,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { FastifyReply as Response } from 'fastify';
+import { Response, Request } from 'express';
 import { AuthGuard } from '../security/authGuard';
 import { CommonResponse } from '../dto/response/commonResponse';
-import { Profile } from '.prisma/client';
+import { Profile } from '@prisma/client';
 import { UpdateProfileRequest } from '../dto/request/auth/updateProfileRequest';
 import { handleException } from '../utils/handleException';
 
@@ -31,34 +31,22 @@ export class ProfileController {
   async getProfiles(@Res() res: Response) {
     try {
       const getProfilesResponse: Profile[] = await this.profileService.getAll();
-      const commonResponse = new CommonResponse(
-        'get profiles Successfully',
+      return new CommonResponse('get profiles Successfully',
         HttpStatus.ACCEPTED,
-        getProfilesResponse,
-      );
-      res.code(commonResponse.statusCode).send(commonResponse);
+        getProfilesResponse,)
     } catch (error) {
       if (error instanceof ConflictException) {
-        const commonResponse = new CommonResponse(
-          error.message,
+        return new CommonResponse( error.message,
           HttpStatus.CONFLICT,
-          null,
-        );
-        res.code(commonResponse.statusCode).send(commonResponse);
+          null,)
       } else if (error instanceof NotFoundException) {
-        const commonResponse = new CommonResponse(
-          error.message,
+        return new CommonResponse( error.message,
           HttpStatus.NOT_FOUND,
-          null,
-        );
-        res.code(commonResponse.statusCode).send(commonResponse);
+          null,)
       } else {
-        const commonResponse = new CommonResponse(
-          'Internal server error',
+        return new CommonResponse(  'Internal server error',
           HttpStatus.INTERNAL_SERVER_ERROR,
-          null,
-        );
-        res.code(commonResponse.statusCode).send(commonResponse);
+          null,)
       }
     }
   }
@@ -69,14 +57,11 @@ export class ProfileController {
     try {
       const getProfileResponse: Profile =
         await this.profileService.getOne(uuid);
-      const commonResponse = new CommonResponse(
-        'get profile Successfully',
+      return new CommonResponse( 'get profile Successfully',
         HttpStatus.ACCEPTED,
-        getProfileResponse,
-      );
-      res.code(commonResponse.statusCode).send(commonResponse);
+        getProfileResponse,)
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
@@ -86,14 +71,13 @@ export class ProfileController {
     try {
       const getProfileResponse: Profile =
         await this.profileService.getOneByUser(id);
-      const commonResponse = new CommonResponse(
+      return new CommonResponse(
         'get profile Successfully',
         HttpStatus.ACCEPTED,
         getProfileResponse,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
@@ -102,7 +86,7 @@ export class ProfileController {
   async updateProfile(
     @Param('id') id: string,
     @Body() updateData: UpdateProfileRequest,
-    @Request() req: any,
+    @Req() req: any,
     @Res() res: Response,
   ) {
     const { username } = req.user;
@@ -118,11 +102,11 @@ export class ProfileController {
       updateData,
       username,
     );
-    const commonResponse = new CommonResponse(
+    return new CommonResponse(
       'Update Profile Successfully',
       HttpStatus.ACCEPTED,
       profileUpdateResponse,
     );
-    res.code(commonResponse.statusCode).send(commonResponse);
+
   }
 }

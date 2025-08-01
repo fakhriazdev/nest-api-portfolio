@@ -1,25 +1,32 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as fastifyCookie from '@fastify/cookie';
+import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+async function bootstrap(): Promise<void> {
+  const app = await NestFactory.create(AppModule);
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-    { cors: true },
-  );
-
-  app.register(require('@fastify/cookie').default, {
-    secret: 'your-secret-key', // Optional, if you want to sign the cookies
-    parseOptions: {}, // Optional cookie parsing options
+  // Cookie parser
+  app.use(cookieParser());
+  // Built-in CORS handler (NestJS-level)
+  app.enableCors({
+    origin: '',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   });
 
-  const port = process.env.PORT || 3000;
+  // ValidationPipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  const port: string | number = process.env.PORT || 2000;
   await app.listen(port, '0.0.0.0');
 }
+
 bootstrap();

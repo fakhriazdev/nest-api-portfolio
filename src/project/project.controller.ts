@@ -6,7 +6,7 @@ import {
   Param,
   Patch,
   Post,
-  Request,
+Req,
   Res,
   UploadedFiles,
   UseGuards,
@@ -15,7 +15,7 @@ import {
 import { ProjectService } from './project.service';
 import { AuthGuard } from '../security/authGuard';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
-import { FastifyReply as Response } from 'fastify';
+import { Response } from 'express';
 import { Project } from '@prisma/client';
 import { CommonResponse } from '../dto/response/commonResponse';
 import { handleException } from '../utils/handleException';
@@ -28,7 +28,7 @@ export class ProjectController {
   @Post('project')
   @UseGuards(AuthGuard)
   async createProject(
-    @Request() request: any,
+    @Req() request: any,
     @Body() projectRequest: ProjectRequest,
     @Res() res: Response,
   ) {
@@ -36,14 +36,13 @@ export class ProjectController {
     try {
       const getAddProjectResponse: Project =
         await this.projectService.addProject(projectRequest, username);
-      const commonResponse = new CommonResponse(
+      return new CommonResponse(
         'Create Project Successfully',
         HttpStatus.CREATED,
         getAddProjectResponse,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
@@ -52,38 +51,36 @@ export class ProjectController {
   async getProjects(@Res() res: Response) {
     try {
       const projectsResponse: any = await this.projectService.getAllProjects();
-      const commonResponse = new CommonResponse(
+      return new CommonResponse(
         'Get Projects Successfully',
         HttpStatus.OK,
         projectsResponse,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
-  @Post('project/upload')
-  @UseGuards(AuthGuard)
-  @UseInterceptors(FilesInterceptor('file'))
-  async uploadImage(@UploadedFiles() file, @Res() res: Response) {
-    try {
-      const responseUploadImage = await this.projectService.addImage(file);
-      const commonResponse = new CommonResponse(
-        'Get Projects Successfully',
-        HttpStatus.OK,
-        responseUploadImage,
-      );
-      res.code(commonResponse.statusCode).send(commonResponse);
-    } catch (error) {
-      handleException(error, res);
-    }
-  }
+  // @Post('project/upload')
+  // @UseGuards(AuthGuard)
+  // @UseInterceptors(FilesInterceptor('file'))
+  // async uploadImage(@UploadedFiles() file, @Res() res: Response) {
+  //   try {
+  //     const responseUploadImage = await this.projectService.addImage(file);
+  //     return new CommonResponse(
+  //       'Get Projects Successfully',
+  //       HttpStatus.OK,
+  //       responseUploadImage,
+  //     );
+  //   } catch (error) {
+  //     handleException(error, res);
+  //   }
+  // }
 
   @Patch('project/:uuid')
   @UseGuards(AuthGuard)
   async updateProjectById(
-    @Request() request: any,
+    @Req() request: any,
     @Param('uuid') uuid: string,
     @Body() projectRequest: ProjectRequest,
     @Res() res: Response,
@@ -96,14 +93,13 @@ export class ProjectController {
         projectRequest,
         username,
       );
-      const commonResponse = new CommonResponse(
+      return new CommonResponse(
         'Update Project Successfully',
         HttpStatus.OK,
         responseUpdateProjectById,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
@@ -121,15 +117,14 @@ export class ProjectController {
         HttpStatus.OK,
         responseGetProject,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 
   @Get('projects/user')
   @UseGuards(AuthGuard)
-  async getProjectsByUserId(@Request() request: any, @Res() res: Response) {
+  async getProjectsByUserId(@Req() request: any, @Res() res: Response) {
     const { username } = request.user;
     try {
       const responseGetProject: Project[] =
@@ -139,9 +134,8 @@ export class ProjectController {
         HttpStatus.OK,
         responseGetProject,
       );
-      res.code(commonResponse.statusCode).send(commonResponse);
     } catch (error) {
-      handleException(error, res);
+      handleException(error);
     }
   }
 }

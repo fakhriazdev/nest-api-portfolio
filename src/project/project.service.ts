@@ -7,8 +7,7 @@ import { PrismaService } from '../db/prisma.service';
 import { v4 } from 'uuid';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
 import { $Enums, Project, Stack } from '@prisma/client';
-import { put } from '@vercel/blob';
-import { Profile } from '.prisma/client';
+import { Profile } from '@prisma/client';
 import { ProfileService } from '../profile/profile.service';
 
 @Injectable()
@@ -17,19 +16,19 @@ export class ProjectService {
     private readonly profileService: ProfileService,
     private readonly prisma: PrismaService,
   ) {}
-  async addImage(file) {
-    try {
-      if (!file) {
-        throw new Error('No files uploaded');
-      }
-      return await put(file.filename(), file, {
-        access: 'public',
-        multipart: true,
-      });
-    } catch (err) {
-      throw new Error(err.message);
-    }
-  }
+  // async addImage(file) {
+  //   try {
+  //     if (!file) {
+  //       throw new Error('No files uploaded');
+  //     }
+  //     return await put(file.filename(), file, {
+  //       access: 'public',
+  //       multipart: true,
+  //     });
+  //   } catch (err) {
+  //     throw new Error(err.message);
+  //   }
+  // }
   async addProject(
     request: ProjectRequest,
     username: string,
