@@ -5,13 +5,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../db/prisma.service';
 import { LoginRequest } from '../dto/request/auth/loginRequest';
 import { RegisterRequest } from '../dto/request/auth/registerRequest';
 import { LoginResponse } from '../dto/response/LoginResponse';
 import { RegisterResponse } from '../dto/response/RegisterResponse';
 import { comparePassword, encodePassord } from '../utils/bcrypt';
 import { v4 } from 'uuid';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {

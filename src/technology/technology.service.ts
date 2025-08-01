@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from '../db/prisma.service';
 import { Project, Technology } from '@prisma/client';
 import { RequestAddTechnology } from '../dto/request/technology/requestAddTechnology';
 import { v4 } from 'uuid';
 import { ProjectService } from '../project/project.service';
 import { RequestUpdateTechnology } from '../dto/request/technology/requestUpdateTechnology';
 import { RequestDeleteTechnology } from '../dto/request/technology/requestDeleteTechnology';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TechnologyService {

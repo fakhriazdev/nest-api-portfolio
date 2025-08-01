@@ -1,6 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TechnologyService } from './technology.service';
-import { PrismaService } from '../db/prisma.service';
 import { ProjectModule } from '../project/project.module';
 
 
@@ -8,7 +7,7 @@ import { ProjectModule } from '../project/project.module';
   imports: [
     forwardRef(() => ProjectModule), // Import ProjectModule dengan forwardRef jika ada referensi silang
   ],
-  providers: [TechnologyService, PrismaService],
+  providers: [TechnologyService],
   exports: [TechnologyService],
 })
 export class TechnologyModule {}

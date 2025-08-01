@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../db/prisma.service';
 import { Comment } from '@prisma/client';
 import { AddCommentRequest } from '../dto/request/comment/addCommentRequest';
 import { v4 } from 'uuid';
+import { PrismaService } from '../prisma/prisma.service';
 
 
 @Injectable()

@@ -3,12 +3,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../db/prisma.service';
 import { v4 } from 'uuid';
 import { ProjectRequest } from '../dto/request/project/projectRequest';
 import { $Enums, Project, Stack } from '@prisma/client';
 import { Profile } from '@prisma/client';
 import { ProfileService } from '../profile/profile.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ProjectService {
