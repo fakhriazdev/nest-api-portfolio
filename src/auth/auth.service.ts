@@ -1,4 +1,4 @@
-import { Profile, User } from '@prisma/client';
+import { Profile, User } from '../../prisma/generated/client';
 import {
   ConflictException,
   Injectable,
@@ -21,73 +21,55 @@ export class AuthService {
   ) {}
 
   async validateUser(request: LoginRequest): Promise<LoginResponse> {
-    const findUser = await this.prisma.user.findFirst({
+    const user = await this.prisma.user.findUnique({
       where: { username: request.username },
     });
-    if (!findUser) {
-      throw new UnauthorizedException('Bad Credential');
+
+    if (!user || !(await comparePassword(request.password, user.password))) {
+      throw new UnauthorizedException('Invalid username or password');
     }
 
-    try {
-      const isPasswordValid = await comparePassword(
-        request.password,
-        findUser.password,
-      );
-      if (!isPasswordValid) {
-        throw new UnauthorizedException('Bad Credential');
-      }
-      const payload = { username: findUser.username, name: findUser.name };
-      const token = await this.jwtService.signAsync(payload);
-      return { token };
-    } catch (error) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    const payload = { username: user.username, name: user.name };
+    const token = await this.jwtService.signAsync(payload);
+    return { token };
   }
 
+
   async addUser(request: RegisterRequest): Promise<RegisterResponse> {
-    try {
-      const { newUser } = await this.prisma.$transaction(async (prisma) => {
-        const existingUser = await prisma.user.findUnique({
-          where: {
-            username: request.username,
-          },
-        });
+    return this.prisma.$transaction(async (tx) => {
+      const existingUser = await tx.user.findUnique({
+        where: { username: request.username },
+      });
 
-        if (existingUser) {
-          throw new ConflictException('Username already exists');
-        }
+      if (existingUser) {
+        throw new ConflictException('Username already exists');
+      }
 
-        const generatedPw = await encodePassord(request.password);
-        const newUser: User = await prisma.user.create({
-          data: {
-            username: request.username,
-            password: generatedPw,
-            name: request.name,
-          },
-        });
+      const hashedPassword = await encodePassord(request.password);
 
-        const newProfile: Profile = await prisma.profile.create({
-          data: {
-            uuid: v4(),
-            image: null,
-            title: null,
-            bio: null,
-            userId: newUser.username,
-          },
-        });
+      const createdUser = await tx.user.create({
+        data: {
+          username: request.username,
+          password: hashedPassword,
+          name: request.name,
+        },
+      });
 
-        return {
-          newUser,
-          newProfile,
-        };
+      await tx.profile.create({
+        data: {
+          uuid: v4(),
+          image: null,
+          title: null,
+          bio: null,
+          userId: createdUser.username,
+        },
       });
 
       return {
-        username: newUser.username,
-        name: newUser.name,
+        username: createdUser.username,
+        name: createdUser.name,
       };
-    } catch (error) {
-      throw new ConflictException(error);
-    }
+    });
   }
+
 }

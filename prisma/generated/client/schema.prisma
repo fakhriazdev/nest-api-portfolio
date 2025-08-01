@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Education {
+  uuid        String  @id
+  title       String
+  from        String
+  profileUuid String
+  profile     Profile @relation(fields: [profileUuid], references: [uuid])
+
+  @@map("m_education")
+}
+
+model Profile {
+  uuid      String      @id
+  image     String?
+  title     String?
+  bio       String?
+  education Education[]
+  projects  Project[]
+  follower  Follower[]
+  user      User        @relation(fields: [userId], references: [username])
+  userId    String      @unique
+
+  @@map("m_profile")
+}
+
+model Follower {
+  uuid        String  @id
+  profileUUID String
+  userId      String
+  profile     Profile @relation(fields: [profileUUID], references: [uuid])
+
+  @@map("m_follower")
+}
+
+model Project {
+  uuid        String       @id
+  title       String
+  description String
+  stack       Stack        @default(FULLSTACK)
+  userId      String
+  user        User         @relation(fields: [userId], references: [username])
+  profileUuid String
+  profile     Profile      @relation(fields: [profileUuid], references: [uuid])
+  technology  Technology[]
+  comments    Comment[]
+  likes       Like[]
+  createdAt   DateTime
+
+  @@map("m_project")
+}
+
+model Comment {
+  uuid      String   @id
+  projectId String
+  comment   String
+  userId    String
+  project   Project  @relation(fields: [projectId], references: [uuid])
+  createdAt DateTime
+
+  @@map("t_comment")
+}
+
+model Like {
+  uuid      String  @id
+  projectId String
+  userId    String
+  project   Project @relation(fields: [projectId], references: [uuid])
+
+  @@map("t_like")
+}
+
+model Technology {
+  uuid      String  @id
+  name      String
+  image     String
+  projectId String
+  userId    String
+  user      User?   @relation(fields: [userId], references: [username])
+  Project   Project @relation(fields: [projectId], references: [uuid])
+
+  @@map("m_technology")
+}
+
+model Testimonial {
+  uuid   String  @id
+  title  String
+  desc   String
+  by     String
+  status Status  @default(IDLE)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [username])
+
+  @@map("m_testimonial")
+}
+
+model User {
+  username    String        @unique
+  name        String
+  password    String
+  profile     Profile?
+  project     Project[]
+  technology  Technology[]
+  testimonial Testimonial[]
+
+  @@map("m_user")
+}
+
+enum Stack {
+  FULLSTACK
+  FRONTEND
+  BACKEND
+}
+
+enum Status {
+  APPROVE
+  IDLE
+}

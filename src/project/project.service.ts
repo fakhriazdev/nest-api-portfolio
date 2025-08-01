@@ -1,14 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { v4 } from 'uuid';
-import { ProjectRequest } from '../dto/request/project/projectRequest';
-import { $Enums, Project, Stack } from '@prisma/client';
-import { Profile } from '@prisma/client';
 import { ProfileService } from '../profile/profile.service';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ProjectRequest } from '../dto/request/project/projectRequest';
+import { Project, Stack } from '../../prisma/generated/client';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ProjectService {
@@ -16,112 +11,50 @@ export class ProjectService {
     private readonly profileService: ProfileService,
     private readonly prisma: PrismaService,
   ) {}
-  // async addImage(file) {
-  //   try {
-  //     if (!file) {
-  //       throw new Error('No files uploaded');
-  //     }
-  //     return await put(file.filename(), file, {
-  //       access: 'public',
-  //       multipart: true,
-  //     });
-  //   } catch (err) {
-  //     throw new Error(err.message);
-  //   }
-  // }
-  async addProject(
-    request: ProjectRequest,
-    username: string,
-  ): Promise<Project> {
-    const stack: $Enums.Stack = this.getStackEnumFromString(request.stack);
-    const profile: Profile = await this.profileService.getOneByUser(username);
+
+  private readonly stackMap: Record<string, Stack> = {
+    fullstack: Stack.FULLSTACK,
+    frontend: Stack.FRONTEND,
+    backend: Stack.BACKEND,
+  };
+
+  async addProject(request: ProjectRequest, username: string): Promise<Project> {
+    const stack = this.getStackEnumFromString(request.stack);
+    const profile = await this.profileService.getOneByUser(username);
+
     if (profile.userId !== username) {
       throw new UnauthorizedException();
     }
-    const project: Project = await this.prisma.project.create({
+
+    return this.prisma.project.create({
       data: {
-        uuid: v4(),
+        uuid: uuidv4(),
         title: request.title,
-        stack,
         description: request.description,
+        stack,
         profileUuid: profile.uuid,
         userId: username,
-        createdAt: new Date(),
+        createdAt: new Date(), // atau biarkan Prisma handle default-nya
       },
     });
-    return project;
   }
-  async getAllProjects(): Promise<Project[]> {
-    const Projects: Project[] = await this.prisma.project.findMany({
+
+  async getDetailProject(uuid: string): Promise<Project> {
+    return this.prisma.project.findUniqueOrThrow({
+      where: { uuid },
       include: {
         technology: true,
+        comments: true,
+        likes: true,
+        profile: true,
+        user: true, // jika relasi ada di schema
       },
-    });
-    return Projects;
-  }
-  async updateProject(
-    uuid: string,
-    request: ProjectRequest,
-    username: string,
-  ): Promise<Project> {
-    const { title, stack } = request;
-    const Estack: $Enums.Stack = this.getStackEnumFromString(stack);
-    const data: Project = await this.prisma.project.findUnique({
-      where: {
-        uuid,
-      },
-    });
-    if (!data || data.userId !== username) {
-      throw new UnauthorizedException(
-        'You are not authorized to update this project.',
-      );
-    }
-    const updatedProject: Project = await this.prisma.project.update({
-      where: {
-        uuid,
-      },
-      data: {
-        title,
-        stack: Estack,
-        userId: username,
-      },
-    });
-
-    return updatedProject;
-  }
-  async getDetailProject(uuid: string): Promise<Project> {
-    try {
-      return this.prisma.project.findUnique({
-        where: { uuid },
-      });
-    } catch (error) {
-      throw new NotFoundException();
-    }
-  }
-
-  async getProjectsByUserId(userId: string): Promise<Project[]> {
-    return this.prisma.project.findMany({
-      where: { userId },
-      include:{
-        comments: {
-          select: {
-            uuid: true,
-          },
-        },
-      }
     });
   }
 
   private getStackEnumFromString(stackString: string): Stack {
-    switch (stackString.toLowerCase()) {
-      case 'fullstack':
-        return Stack.FULLSTACK;
-      case 'frontend':
-        return Stack.FRONTEND;
-      case 'backend':
-        return Stack.BACKEND;
-      default:
-        throw new Error('Invalid stack value');
-    }
+    const stack = this.stackMap[stackString.toLowerCase()];
+    if (!stack) throw new Error(`Invalid stack value: ${stackString}`);
+    return stack;
   }
 }

@@ -1,127 +1,105 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { Education,Profile } from '@prisma/client';
-import { v4 } from 'uuid';
-import { UpdateEducationRequest } from '../dto/request/education/UpdateEducationRequest';
-import { DeleteEducationRequest } from '../dto/request/education/deleteEducationRequest';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { AddEducationRequest } from '../dto/request/education/AddEducationRequest';
-import { ProfileService } from '../profile/profile.service';
+import { UpdateEducationRequest } from '../dto/request/education/UpdateEducationRequest';
+import { DeleteEducationRequest } from '../dto/request/education/DeleteEducationRequest';
 import { PrismaService } from '../prisma/prisma.service';
+import { ProfileService } from '../profile/profile.service';
+import { Education } from '../../prisma/generated/client';
 
 @Injectable()
 export class EducationService {
   constructor(
-    @Inject(forwardRef(() => ProfileService))
-    private readonly profileService: ProfileService,
     private readonly prisma: PrismaService,
+    private readonly profileService: ProfileService,
   ) {}
+
   async getEducation(uuid: string): Promise<Education> {
-    return this.prisma.education.findFirstOrThrow({
-      where: { uuid },
-    });
-  }
-  async bulkUpdateEducation(
-    request: UpdateEducationRequest[],
-    username: string,
-  ): Promise<Education[]> {
     try {
-      return await this.prisma.$transaction(async (tPrisma) => {
-        const educations: Promise<Education>[] = request.map(
-          async (item: UpdateEducationRequest) => {
-            try {
-              const profile: Profile = await this.profileService.getOne(
-                item.profileUuid,
-              );
-              if (profile.userId === username && profile) {
-                return await tPrisma.education.update({
-                  where: { uuid: item.uuid },
-                  data: {
-                    uuid: v4(),
-                    title: item.title,
-                    from: item.from,
-                    profileUuid: item.profileUuid,
-                  },
-                });
-              } else {
-                throw new Error('unauthorized');
-              }
-            } catch (error) {
-              throw new Error(error.message);
-            }
-          },
-        );
-        return await Promise.all(educations);
+      return await this.prisma.education.findFirstOrThrow({
+        where: { uuid },
       });
-    } catch (error) {
-      throw new Error(`Failed to update Education`);
+    } catch {
+      throw new NotFoundException('Education not found');
     }
   }
-  async bulkRemoveEducation(
-    request: DeleteEducationRequest[],
-    username: string,
-  ): Promise<void> {
-    try {
-      await this.prisma.$transaction(async (tPrisma) => {
-        await Promise.all(
-          request.map(async (item: DeleteEducationRequest) => {
-            try {
-              const education: Education = await this.getEducation(item.uuid);
-              const profile: Profile = await this.profileService.getOne(
-                education.profileUuid,
-              );
-              if (profile.userId === username) {
-                await tPrisma.education.delete({
-                  where: { uuid: item.uuid },
-                });
-              } else {
-                throw new Error('unauthorized');
-              }
-            } catch (error) {
-              throw new Error(error.message);
-            }
-          }),
-        );
-      });
-    } catch (error) {
-      throw new Error(`Failed to update Education: ${error.message}`);
-    }
+
+  async getEducations(): Promise<Education[]> {
+    return this.prisma.education.findMany();
   }
 
   async bulkAddEducation(
     request: AddEducationRequest[],
     username: string,
   ): Promise<Education[]> {
-    try {
-      return await this.prisma.$transaction(async (tPrisma) => {
-        const educations: Promise<Education>[] = request.map(
-          async (item: AddEducationRequest) => {
-            try {
-              const profile: Profile = await this.profileService.getOne(
-                item.profileUuid,
-              );
-              if (profile.userId === username) {
-                return await tPrisma.education.create({
-                  data: {
-                    uuid: v4(),
-                    title: item.title,
-                    from: item.from,
-                    profileUuid: item.profileUuid,
-                  },
-                });
-              } else {
-                throw new Error('unauthorized');
-              }
-            } catch (error) {
-              throw new Error(error.message);
-            }
+    return this.prisma.$transaction(async (tx) => {
+      const creations = request.map(async (item) => {
+        const profile = await this.profileService.getOne(item.profileUuid);
+        if (!profile || profile.userId !== username) {
+          throw new UnauthorizedException();
+        }
+
+        return tx.education.create({
+          data: {
+            uuid: uuidv4(),
+            title: item.title,
+            from: item.from,
+            profileUuid: item.profileUuid,
           },
-        );
-        return await Promise.all(educations);
+        });
       });
-    } catch (error) {
-      throw error;
-    }
+
+      return Promise.all(creations);
+    });
   }
-  async getEducations(): Promise<Education[]> {
-    return this.prisma.education.findMany({});
+
+  async bulkUpdateEducation(
+    request: UpdateEducationRequest[],
+    username: string,
+  ): Promise<Education[]> {
+    return this.prisma.$transaction(async (tx) => {
+      const updates = request.map(async (item) => {
+        const profile = await this.profileService.getOne(item.profileUuid);
+        if (!profile || profile.userId !== username) {
+          throw new UnauthorizedException();
+        }
+
+        return tx.education.update({
+          where: { uuid: item.uuid },
+          data: {
+            title: item.title,
+            from: item.from,
+            profileUuid: item.profileUuid,
+          },
+        });
+      });
+
+      return Promise.all(updates);
+    });
+  }
+
+  async bulkRemoveEducation(
+    request: DeleteEducationRequest[],
+    username: string,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const deletions = request.map(async (item) => {
+        const education = await this.getEducation(item.uuid);
+        const profile = await this.profileService.getOne(education.profileUuid);
+        if (!profile || profile.userId !== username) {
+          throw new UnauthorizedException();
+        }
+
+        return tx.education.delete({
+          where: { uuid: item.uuid },
+        });
+      });
+
+      await Promise.all(deletions);
+    });
   }
 }

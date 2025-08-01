@@ -6,7 +6,8 @@ import {
   Res,
   UseGuards,
   Get,
-  ValidationPipe, Req,
+  ValidationPipe,
+  Req,
 } from '@nestjs/common';
 import { LoginRequest } from '../dto/request/auth/loginRequest';
 import { RegisterRequest } from '../dto/request/auth/registerRequest';
@@ -17,58 +18,55 @@ import { LoginResponse } from '../dto/response/LoginResponse';
 import { AuthGuard } from '../security/authGuard';
 import { handleException } from '../utils/handleException';
 import { Response, Request } from 'express';
-import { User } from '@prisma/client';
+import { User } from '../../prisma/generated/client';
 
 @Controller('/api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/login')
-  async login(
-    @Body(new ValidationPipe({ transform: true })) request: LoginRequest,
-    @Res() res: Response,
-  ){
+  async login(@Body() request: LoginRequest, @Res({ passthrough: true }) res: Response) {
     try {
-      const loginResponse: LoginResponse =
-        await this.authService.validateUser(request);
-      res.cookie('jwt', loginResponse.token, {
-        httpOnly: true, // Make cookie accessible only by HTTP requests
-        path: '/', // Path where cookie is accessible (default to root '/')
-        maxAge: 1000 * 60 * 60 * 24, // Cookie expiration time (e.g., 1 day)
+      const loginResponse: LoginResponse = await this.authService.validateUser(request);
+      (res as any).cookie('jwt', loginResponse.token, {
+        path: '/',
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 1000 * 60 * 60 * 24,
       });
-      const commonResponse = new CommonResponse(
-        'Login Successfully',
-        HttpStatus.ACCEPTED,
-        null,
-      );
-      return new CommonResponse('Login Successful', HttpStatus.OK, loginResponse)
+      return new CommonResponse('Login Successful', HttpStatus.OK, loginResponse);
     } catch (error) {
-      handleException(error);
+      return handleException(error.message);
     }
   }
 
   @Post('/register')
   async register(
     @Body(new ValidationPipe({ transform: true })) request: RegisterRequest,
-    @Res() res: Response,
-  ){
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
-      const registerResponse: RegisterResponse =
-        await this.authService.addUser(request);
-      return new CommonResponse('Login Successful', HttpStatus.OK, registerResponse)
+      const registerResponse: RegisterResponse = await this.authService.addUser(request);
+      return new CommonResponse('Login Successful', HttpStatus.OK, registerResponse);
     } catch (error) {
-      handleException(error);
+      return handleException(error.message);
     }
   }
 
   @UseGuards(AuthGuard)
   @Post('/logout')
-  async logout(@Res({ passthrough: true }) res: Response){
+  async logout(@Res({ passthrough: true }) res: Response) {
     try {
-      res.clearCookie('jwt');
-      return new CommonResponse('Login Successful', HttpStatus.OK, null)
+      (res as any).clearCookie('jwt', {
+        path: '/',
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+      });
+      return new CommonResponse('Login Successful', HttpStatus.OK, null);
     } catch (error) {
-      handleException(error);
+      return handleException(error.message);
     }
   }
 
@@ -76,7 +74,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   UserInfo(@Req() request: Request) {
     const user = request['user'] as User;
-    const { username,name } = user;
+    const { username, name } = user;
     return new CommonResponse('Welcome', HttpStatus.OK, { username, name });
   }
 }

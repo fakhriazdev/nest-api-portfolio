@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { Project, Technology } from '@prisma/client';
+import { Project, Technology } from '../../prisma/generated/client';
 import { RequestAddTechnology } from '../dto/request/technology/requestAddTechnology';
 import { v4 } from 'uuid';
 import { ProjectService } from '../project/project.service';
