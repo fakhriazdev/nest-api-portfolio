@@ -6,10 +6,10 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { AddEducationRequest } from '../dto/request/education/AddEducationRequest';
 import { UpdateEducationRequest } from '../dto/request/education/UpdateEducationRequest';
-import { DeleteEducationRequest } from '../dto/request/education/DeleteEducationRequest';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProfileService } from '../profile/profile.service';
 import { Education } from '../../prisma/generated/client';
+import { DeleteEducationRequest } from '../dto/request/education/deleteEducationRequest';
 
 @Injectable()
 export class EducationService {
