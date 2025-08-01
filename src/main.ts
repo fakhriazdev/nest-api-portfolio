@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
   app.use(cookieParser());
   // Built-in CORS handler (NestJS-level)
   app.enableCors({
-    origin: '',
+    origin: 'https://stat-app-web.vercel.app/',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
